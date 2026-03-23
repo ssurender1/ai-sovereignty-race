@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Sovereignty Race</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080c18;--card:rgba(16,22,48,.85);--border:rgba(40,56,120,.4);
+  --accent:#4f8cff;--gold:#ffd700;--green:#22c55e;--red:#ef4444;
+  --orange:#f59e0b;--text:#e2e8f0;--muted:#7888a8;--dim:#2a3654;
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(79,140,255,.06),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(168,85,247,.05),transparent 50%);pointer-events:none;z-index:0}
+h1,h2,h3{font-weight:700}
+
+/* Particles canvas */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* Global wrapper */
+.screen{position:relative;z-index:1}
+
+/* Buttons */
+.btn{padding:12px 28px;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .4s}
+.btn:hover::after{transform:translateX(100%)}
+.btn-primary{background:linear-gradient(135deg,#4f8cff,#3b6fdb);color:#fff;box-shadow:0 4px 20px rgba(79,140,255,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(79,140,255,.4)}
+.btn-secondary{background:rgba(30,40,80,.6);color:var(--text);border:1px solid var(--border);backdrop-filter:blur(10px)}
+.btn-secondary:hover{border-color:var(--accent);background:rgba(40,56,120,.4)}
+.btn-sm{padding:8px 16px;font-size:.85rem}
+.btn-gold{background:linear-gradient(135deg,#ffd700,#f59e0b);color:#000;box-shadow:0 4px 20px rgba(255,215,0,.3)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+
+/* ─── SPLASH ─── */
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:var(--bg)}
+#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(79,140,255,.12),transparent 60%),radial-gradient(circle at 30% 70%,rgba(168,85,247,.08),transparent 50%),radial-gradient(circle at 70% 60%,rgba(255,215,0,.06),transparent 50%)}
+#splash>*{position:relative;z-index:1}
+#splash h1{font-size:clamp(2rem,5vw,3.5rem);background:linear-gradient(135deg,#4f8cff 0%,#a78bfa 40%,#ffd700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem;letter-spacing:-1px}
+#splash .subtitle{font-size:clamp(.9rem,2vw,1.15rem);color:var(--muted);margin-bottom:2rem;max-width:600px;line-height:1.6}
+.cake-wrap{perspective:800px;margin:1rem 0 1.5rem}
+.cake-diagram{display:flex;flex-direction:column;align-items:center;gap:5px;transform:rotateX(8deg)}
+.cake-layer{padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:700;color:#fff;text-align:center;opacity:0;animation:cakeSlide .5s forwards;letter-spacing:.5px;box-shadow:0 2px 12px rgba(0,0,0,.3);position:relative;overflow:hidden}
+.cake-layer::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 3s infinite}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+.cake-layer:nth-child(1){background:linear-gradient(135deg,#f59e0b,#d97706);animation-delay:.1s;width:300px}
+.cake-layer:nth-child(2){background:linear-gradient(135deg,#8b5cf6,#7c3aed);animation-delay:.2s;width:275px}
+.cake-layer:nth-child(3){background:linear-gradient(135deg,#06b6d4,#0891b2);animation-delay:.3s;width:250px}
+.cake-layer:nth-child(4){background:linear-gradient(135deg,#22c55e,#16a34a);animation-delay:.4s;width:225px}
+.cake-layer:nth-child(5){background:linear-gradient(135deg,#3b82f6,#2563eb);animation-delay:.5s;width:200px}
+.cake-layer:nth-child(6){background:linear-gradient(135deg,#ef4444,#dc2626);animation-delay:.6s;width:175px}
+.cake-layer:nth-child(7){background:linear-gradient(135deg,#ec4899,#db2777);animation-delay:.7s;width:150px}
+@keyframes cakeSlide{from{opacity:0;transform:translateY(15px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.splash-flags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;font-size:2rem}
+.splash-flags span{animation:flagBounce 2s infinite;display:inline-block}
+.splash-flags span:nth-child(1){animation-delay:0s}
+.splash-flags span:nth-child(2){animation-delay:.15s}
+.splash-flags span:nth-child(3){animation-delay:.3s}
+.splash-flags span:nth-child(4){animation-delay:.45s}
+.splash-flags span:nth-child(5){animation-delay:.6s}
+.splash-flags span:nth-child(6){animation-delay:.75s}
+.splash-flags span:nth-child(7){animation-delay:.9s}
+.splash-flags span:nth-child(8){animation-delay:1.05s}
+@keyframes flagBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.splash-info{font-size:.88rem;color:var(--muted);margin:1rem 0;max-width:560px;line-height:1.6}
+.splash-btns{display:flex;gap:14px;margin-top:1.2rem;flex-wrap:wrap;justify-content:center}
+.splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px}
+
+/* ─── COUNTRY SELECT ─── */
+#country-select{display:none;padding:2rem;max-width:1000px;margin:0 auto;text-align:center}
+#country-select h2{font-size:1.8rem;margin-bottom:.3rem}
+#country-select .sub{color:var(--muted);margin-bottom:1.5rem;font-size:.95rem}
+.country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:2rem}
+.country-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .3s;text-align:left;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.country-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;filter:blur(40px);opacity:.15;pointer-events:none}
+.country-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 30px rgba(79,140,255,.15)}
+.country-card.selected{border-color:var(--gold);box-shadow:0 0 30px rgba(255,215,0,.2)}
+.country-card .flag{font-size:2.5rem;margin-bottom:6px}
+.country-card .name{font-weight:700;font-size:1.1rem}
+.country-card .desc{font-size:.75rem;color:var(--muted);margin-top:4px;line-height:1.4}
+.country-card .bars{margin-top:10px}
+.mini-bar{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:.72rem;color:var(--muted)}
+.mini-bar-label{width:65px;text-align:right}
+.mini-bar-track{flex:1;height:5px;background:rgba(42,54,84,.8);border-radius:3px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.mini-bar-val{width:24px;font-weight:600;font-size:.7rem}
+.country-card .sov-line{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.country-card .sov-badge{font-size:.8rem;font-weight:700;color:var(--accent)}
+.start-controls{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ─── GAME ─── */
+#game{display:none;padding:1rem 1.5rem;max-width:1440px;margin:0 auto}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.game-header h2{font-size:1.3rem;display:flex;align-items:center;gap:8px}
+.year-badge{background:linear-gradient(135deg,#4f8cff,#3b6fdb);padding:7px 20px;border-radius:24px;font-weight:800;font-size:1.15rem;box-shadow:0 3px 15px rgba(79,140,255,.3);letter-spacing:.5px}
+.turn-indicator{display:flex;gap:4px;align-items:center}
+.turn-dot{width:10px;height:10px;border-radius:50%;background:var(--dim);transition:all .3s}
+.turn-dot.done{background:var(--green)}
+.turn-dot.current{background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.header-controls{display:flex;gap:8px}
+
+.game-layout{display:grid;grid-template-columns:320px 1fr;gap:1rem}
+@media(max-width:960px){.game-layout{grid-template-columns:1fr}}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:1rem;backdrop-filter:blur(10px)}
+.panel h3{font-size:.78rem;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;margin-bottom:4px;transition:all .4s}
+.lb-row.you{background:rgba(79,140,255,.1);border:1px solid rgba(79,140,255,.25)}
+.lb-row .rank{width:22px;text-align:center;font-weight:800;font-size:.85rem}
+.lb-row .rank.gold{color:var(--gold)}
+.lb-row .rank.silver{color:#94a3b8}
+.lb-row .rank.bronze{color:#cd7f32}
+.lb-row .nflag{font-size:1.2rem;width:28px;text-align:center}
+.lb-row .nname{flex:1;font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-row .sbar{width:70px;height:7px;background:var(--dim);border-radius:4px;overflow:hidden}
+.lb-row .sbar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.lb-row .sscore{font-weight:800;font-size:.9rem;min-width:28px;text-align:right}
+.lb-row .sdelta{font-size:.7rem;min-width:32px;text-align:right}
+
+/* Event card */
+.event-card{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(15,23,42,.9));border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.event-card::before{content:'';position:absolute;top:-30%;right:-30%;width:60%;height:60%;background:radial-gradient(circle,rgba(124,58,237,.15),transparent);pointer-events:none}
+.event-card .ev-icon{font-size:1.8rem;margin-bottom:6px}
+.event-card .ev-title{font-size:1.1rem;font-weight:800;color:#c4b5fd;margin-bottom:4px}
+.event-card .ev-desc{font-size:.85rem;color:var(--muted);line-height:1.5}
+.event-card .ev-impact{font-size:.8rem;margin-top:10px;padding:10px;background:rgba(124,58,237,.1);border-radius:8px;color:#ddd6fe;display:flex;flex-wrap:wrap;gap:8px}
+.ev-chip{padding:3px 8px;border-radius:6px;font-size:.75rem;font-weight:600}
+.ev-chip.positive{background:rgba(34,197,94,.15);color:#86efac}
+.ev-chip.negative{background:rgba(239,68,68,.15);color:#fca5a5}
+
+/* Lever panel */
+.lever-section h3{display:flex;align-items:center;gap:8px}
+.lever-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px 14px;background:rgba(16,22,48,.6);border:1px solid var(--border);border-radius:10px;transition:all .2s}
+.lever-row:hover{border-color:rgba(79,140,255,.3)}
+.lever-row .lever-icon{font-size:1.1rem;width:24px;text-align:center}
+.lever-row .lever-name{width:90px;font-size:.82rem;font-weight:600}
+.lever-row .lever-bar-wrap{flex:1;position:relative}
+.lever-bar{height:22px;background:var(--dim);border-radius:6px;overflow:hidden;position:relative}
+.lever-bar-fill{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1);position:relative}
+.lever-bar-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);border-radius:6px 6px 0 0}
+.lever-bar-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.72rem;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);display:flex;align-items:center;gap:4px}
+.delta-badge{font-size:.65rem;padding:1px 5px;border-radius:4px;font-weight:700}
+.delta-badge.up{background:rgba(34,197,94,.25);color:#86efac}
+.delta-badge.down{background:rgba(239,68,68,.25);color:#fca5a5}
+.lever-btns{display:flex;gap:4px}
+.lever-btn{width:32px;height:32px;border:1px solid var(--border);background:rgba(16,22,48,.8);color:var(--text);border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;font-weight:700}
+.lever-btn:hover:not(:disabled){border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green);transform:scale(1.1)}
+.lever-btn:disabled{opacity:.25;cursor:not-allowed}
+.lever-btn:active:not(:disabled){transform:scale(.9)}
+
+/* AP display */
+.ap-display{display:flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(245,158,11,.04));border:1px solid rgba(255,215,0,.2);border-radius:12px;margin-bottom:1rem}
+.ap-label{font-size:.88rem;font-weight:700;color:var(--gold)}
+.ap-dots{display:flex;gap:5px}
+.ap-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);transition:all .3s;box-shadow:0 0 8px rgba(255,215,0,.3)}
+.ap-dot.spent{background:var(--dim);box-shadow:none;transform:scale(.8)}
+
+/* Turn actions */
+.turn-actions{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+
+/* Flow animation on lever boost */
+@keyframes flowPulse{0%{box-shadow:inset 0 0 0 rgba(79,140,255,0)}50%{box-shadow:inset 0 0 20px rgba(79,140,255,.3)}100%{box-shadow:inset 0 0 0 rgba(79,140,255,0)}}
+.lever-row.boosted{animation:flowPulse .6s}
+
+/* ─── RESULTS ─── */
+#results{display:none;padding:2rem;max-width:850px;margin:0 auto;text-align:center}
+#results h2{font-size:2.2rem;margin-bottom:.3rem}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;margin:1.5rem 0;backdrop-filter:blur(10px)}
+.final-score{font-size:5rem;font-weight:900;background:linear-gradient(135deg,#4f8cff,#a78bfa,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.final-label{color:var(--muted);margin-bottom:1.5rem;font-size:.9rem}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:1.5rem 0;text-align:left}
+.rg-item{background:rgba(30,40,80,.4);padding:14px;border-radius:10px;border:1px solid var(--border)}
+.rg-item .rg-val{font-size:1.4rem;font-weight:800}
+.rg-item .rg-lbl{font-size:.72rem;color:var(--muted);margin-top:2px}
+.rg-item .rg-delta{font-size:.7rem;font-weight:600}
+
+/* Final leaderboard */
+.final-lb{margin-top:1.5rem;text-align:left}
+.final-lb-row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);font-size:.9rem}
+.final-lb-row .flb-rank{width:20px;font-weight:800}
+.final-lb-row .flb-flag{font-size:1.2rem}
+.final-lb-row .flb-name{flex:1}
+.final-lb-row .flb-score{font-weight:700}
+
+/* History */
+.lb-history{margin-top:1.5rem;text-align:left}
+.lbh-row{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);font-size:.85rem}
+
+/* ─── WATCH MODE ─── */
+#watch-overlay{display:none;position:fixed;inset:0;z-index:50;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--bg)}
+#watch-overlay::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(79,140,255,.1),transparent 60%)}
+#watch-overlay.active{display:flex}
+#watch-overlay>*{position:relative;z-index:1}
+.watch-title{font-size:1.5rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.watch-year{font-size:4rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:.5rem 0 1.5rem}
+.watch-event{font-size:.9rem;color:#c4b5fd;margin-bottom:1.2rem;padding:8px 16px;background:rgba(124,58,237,.1);border-radius:8px;max-width:500px;text-align:center}
+.watch-bars{width:100%;max-width:650px}
+.watch-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.watch-row .wflag{font-size:1.8rem;width:44px;text-align:center}
+.watch-row .wname{width:110px;font-size:.9rem;font-weight:600}
+.watch-row .wbar{flex:1;height:28px;background:var(--dim);border-radius:8px;overflow:hidden;position:relative}
+.watch-row .wbar-fill{height:100%;border-radius:8px;transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.watch-row .wbar-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent);border-radius:8px 8px 0 0}
+.watch-row .wbar-label{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.8rem;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.watch-stop{margin-top:2rem}
+
+/* Rules modal */
+#rulesModal{display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,.8);backdrop-filter:blur(5px)}
+#rulesModal.active{display:flex}
+.rules-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2rem;max-width:560px;max-height:80vh;overflow-y:auto;backdrop-filter:blur(10px)}
+.rules-box h2{margin-bottom:1rem;font-size:1.5rem}
+.rules-box ul{line-height:2;padding-left:1.2rem;color:var(--muted);font-size:.9rem}
+.rules-box strong{color:var(--text)}
+
+/* Slide animation */
+.slide-up{animation:slideUp .5s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Color utils */
+.c-energy{color:#f59e0b}.c-chips{color:#8b5cf6}.c-infra{color:#06b6d4}
+.c-models{color:#22c55e}.c-apps{color:#3b82f6}.c-reg{color:#ef4444}.c-talent{color:#ec4899}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<!-- SPLASH -->
+<div id="splash" class="screen">
+  <h1>AI Sovereignty Race</h1>
+  <p class="subtitle">Guide a nation to AI independence across Jensen Huang's 5-layer stack, plus Regulation & Talent</p>
+  <div class="splash-flags">
+    <span>🇺🇸</span><span>🇨🇳</span><span>🇮🇳</span><span>🇯🇵</span><span>🇸🇦</span><span>🇹🇷</span><span>🇿🇦</span><span>🇫🇷</span>
+  </div>
+  <div class="cake-wrap">
+    <div class="cake-diagram">
+      <div class="cake-layer">Energy & Power Plants</div>
+      <div class="cake-layer">Chips & Compute</div>
+      <div class="cake-layer">Infrastructure & Data Centers</div>
+      <div class="cake-layer">Frontier Models</div>
+      <div class="cake-layer">Applications</div>
+      <div class="cake-layer">Government Regulation</div>
+      <div class="cake-layer">Talent</div>
+    </div>
+  </div>
+  <p class="splash-info">Inspired by NVIDIA CEO Jensen Huang's "5-Layer AI Cake." Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first.</p>
+  <div class="splash-btns">
+    <button class="btn btn-primary" onclick="showCountrySelect()">Play the Game</button>
+    <button class="btn btn-gold" onclick="startWatchMode()">Watch the Race</button>
+  </div>
+  <p class="splash-credit">Stanford TECH 41 &mdash; Building AI Products Through Rapid Prototyping &mdash; Sudeep Surender, 2026</p>
+</div>
+
+<!-- COUNTRY SELECT -->
+<div id="country-select" class="screen">
+  <h2>Choose Your Nation</h2>
+  <p class="sub">Each nation starts with different strengths and weaknesses. Your job: reach AI sovereignty before the others.</p>
+  <div class="country-grid" id="countryGrid"></div>
+  <div class="start-controls">
+    <button class="btn btn-primary" id="startBtn" disabled onclick="startGame()">Select a Nation to Start</button>
+    <button class="btn btn-secondary" onclick="showSplash()">Back</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <h2 id="gameTitle"></h2>
+    <div class="turn-indicator" id="turnIndicator"></div>
+    <div class="year-badge" id="yearBadge">2025</div>
+    <div class="header-controls">
+      <button class="btn btn-sm btn-secondary" onclick="showRules()">?  Rules</button>
+      <button class="btn btn-sm btn-secondary" onclick="confirmQuit()">Quit</button>
+    </div>
+  </div>
+  <div class="game-layout">
+    <div class="left-col">
+      <div class="panel" id="leaderboardPanel">
+        <h3>Sovereignty Leaderboard</h3>
+        <div id="leaderboard"></div>
+      </div>
+      <div class="panel" id="eventPanel">
+        <h3>Global Event This Year</h3>
+        <div id="eventCard"></div>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="ap-display" id="apDisplay"></div>
+      <div class="panel lever-section">
+        <h3><span id="playerFlag"></span> <span id="playerCountryName"></span> &mdash; Your Levers</h3>
+        <div id="leverPanel"></div>
+      </div>
+      <div class="turn-actions">
+        <button class="btn btn-primary" id="endTurnBtn" onclick="endTurn()">End Turn & Advance Year</button>
+        <button class="btn btn-sm btn-secondary" onclick="undoMoves()">Undo This Turn</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <h2 id="resultTitle"></h2>
+  <p id="resultSubtitle" style="color:var(--muted);margin-bottom:.5rem"></p>
+  <div class="result-card">
+    <div class="final-score" id="finalScore"></div>
+    <div class="final-label" id="finalLabel"></div>
+    <div class="result-grid" id="resultGrid"></div>
+  </div>
+  <div class="panel final-lb">
+    <h3>Final Standings</h3>
+    <div id="finalStandings"></div>
+  </div>
+  <div class="panel lb-history" id="lbHistory">
+    <h3>Your Past Games</h3>
+    <div id="historyList"></div>
+  </div>
+  <div style="margin-top:1.5rem;display:flex;gap:14px;justify-content:center">
+    <button class="btn btn-primary" onclick="showCountrySelect()">Play Again</button>
+    <button class="btn btn-secondary" onclick="showSplash()">Home</button>
+  </div>
+</div>
+
+<!-- WATCH MODE -->
+<div id="watch-overlay">
+  <div class="watch-title">AI Sovereignty Race &mdash; Simulation</div>
+  <div class="watch-year" id="watchYear">2025</div>
+  <div class="watch-event" id="watchEvent"></div>
+  <div class="watch-bars" id="watchBars"></div>
+  <button class="btn btn-secondary watch-stop" onclick="stopWatch()">Stop Watching</button>
+</div>
+
+<!-- RULES MODAL -->
+<div id="rulesModal">
+  <div class="rules-box">
+    <h2>How to Play</h2>
+    <ul>
+      <li>You control <strong>one nation</strong>. The other 7 nations race via AI strategy.</li>
+      <li>Each turn = <strong>1 year</strong>. The game spans <strong>10 years</strong> (2025&ndash;2035).</li>
+      <li>You get <strong style="color:var(--gold)">5 Action Points</strong> per turn to boost your 7 sovereignty levers.</li>
+      <li>Each <strong>+10 boost</strong> to a lever costs <strong style="color:var(--gold)">1 AP</strong>.</li>
+      <li>A <strong style="color:#a78bfa">random global event</strong> each year affects all nations differently.</li>
+      <li><strong>Sovereignty Score</strong> = average of all 7 levers, minus a penalty for your weakest lever.</li>
+      <li>First nation to <strong>85+ sovereignty</strong> wins. After 10 years, highest score wins.</li>
+      <li><strong>Player rating</strong> normalizes for country difficulty so harder nations earn more.</li>
+    </ul>
+    <button class="btn btn-primary" style="margin-top:1.2rem;width:100%" onclick="hideRules()">Got it!</button>
+  </div>
+</div>
+
+<script>
+// ─── PARTICLES ───
+(function(){
+  const c=document.getElementById("particles"),ctx=c.getContext("2d");
+  let w,h,particles=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
+  window.addEventListener("resize",resize);resize();
+  for(let i=0;i<60;i++){
+    particles.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+.5,dx:(Math.random()-.5)*.3,dy:(Math.random()-.5)*.3,o:Math.random()*.3+.1});
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.x+=p.dx;p.y+=p.dy;
+      if(p.x<0)p.x=w;if(p.x>w)p.x=0;if(p.y<0)p.y=h;if(p.y>h)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(79,140,255,${p.o})`;ctx.fill();
+    });
+    // Draw connecting lines between close particles
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(79,140,255,${.06*(1-dist/120)})`;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── NATION DATA ───
+const NATIONS = {
+  "United States": {
+    flag:"🇺🇸", color:"#3b82f6",
+    desc:"AI hegemon facing antitrust risks & talent competition",
+    energy:88, chips:92, infrastructure:85, models:95, applications:90, regulation:70, talent:85,
+    aiStyle:"balanced"
+  },
+  "China": {
+    flag:"🇨🇳", color:"#ef4444",
+    desc:"Infrastructure giant, chip embargo is the Achilles heel",
+    energy:78, chips:52, infrastructure:82, models:80, applications:75, regulation:65, talent:72,
+    aiStyle:"infrastructure"
+  },
+  "India": {
+    flag:"🇮🇳", color:"#f59e0b",
+    desc:"Talent powerhouse; bureaucracy slows energy & permits",
+    energy:40, chips:28, infrastructure:38, models:42, applications:62, regulation:32, talent:82,
+    aiStyle:"talent"
+  },
+  "Japan": {
+    flag:"🇯🇵", color:"#ec4899",
+    desc:"Chip legacy & robotics expertise, aging workforce",
+    energy:65, chips:72, infrastructure:68, models:55, applications:72, regulation:58, talent:55,
+    aiStyle:"chips"
+  },
+  "Saudi Arabia": {
+    flag:"🇸🇦", color:"#22c55e",
+    desc:"Unlimited energy wealth, importing talent & tech",
+    energy:92, chips:12, infrastructure:52, models:22, applications:30, regulation:48, talent:18,
+    aiStyle:"energy"
+  },
+  "Turkey": {
+    flag:"🇹🇷", color:"#dc2626",
+    desc:"Strategic location, growing tech sector, regulation gaps",
+    energy:55, chips:18, infrastructure:42, models:32, applications:45, regulation:38, talent:52,
+    aiStyle:"balanced"
+  },
+  "South Africa": {
+    flag:"🇿🇦", color:"#14b8a6",
+    desc:"Emerging AI hubs in Cape Town, severe energy crisis",
+    energy:28, chips:8, infrastructure:25, models:20, applications:32, regulation:38, talent:42,
+    aiStyle:"talent"
+  },
+  "France": {
+    flag:"🇫🇷", color:"#6366f1",
+    desc:"Regulation leader, strong research, execution gaps",
+    energy:72, chips:35, infrastructure:60, models:62, applications:55, regulation:82, talent:65,
+    aiStyle:"regulation"
+  }
+};
+
+const LEVERS=["energy","chips","infrastructure","models","applications","regulation","talent"];
+const LEVER_LABELS={energy:"Energy",chips:"Chips",infrastructure:"Infra",models:"Models",applications:"Apps",regulation:"Regulation",talent:"Talent"};
+const LEVER_FULL={energy:"Energy & Power",chips:"Chips & Compute",infrastructure:"Infrastructure",models:"Frontier Models",applications:"Applications",regulation:"Regulation",talent:"Talent"};
+const LEVER_COLORS={energy:"#f59e0b",chips:"#8b5cf6",infrastructure:"#06b6d4",models:"#22c55e",applications:"#3b82f6",regulation:"#ef4444",talent:"#ec4899"};
+const LEVER_ICONS={energy:"⚡",chips:"🔬",infrastructure:"🏗️",models:"🧠",applications:"📱",regulation:"📜",talent:"🎓"};
+
+const EVENTS=[
+  {title:"Middle East Conflict Escalates",icon:"⚔️",desc:"Oil supply disruptions and shipping lane closures hit energy markets globally.",impact:{energy:-12},affected:["Saudi Arabia","Turkey"],bonus:{energy:8,targets:["Saudi Arabia"]}},
+  {title:"US Antitrust Crackdown",icon:"⚖️",desc:"Tech giants face breakup proceedings. Model development and app ecosystems disrupted.",impact:{models:-10,applications:-6},affected:["United States"],bonus:{models:5,targets:["China","France"]}},
+  {title:"Global Chip Shortage",icon:"🔬",desc:"Foundry bottlenecks and material scarcity reduce chip availability worldwide.",impact:{chips:-12},affected:["all"],bonus:{chips:10,targets:["Japan"]}},
+  {title:"AI Talent Exodus from West",icon:"🎓",desc:"Top AI researchers seek opportunities in emerging markets with better incentives.",impact:{talent:-8},affected:["United States","France"],bonus:{talent:12,targets:["Saudi Arabia","India"]}},
+  {title:"EU-Style AI Act Goes Global",icon:"📜",desc:"Strict AI regulations slow deployment but build international trust frameworks.",impact:{applications:-7,regulation:12},affected:["France","Turkey"],bonus:{regulation:6,targets:["France"]}},
+  {title:"Nuclear Fusion Breakthrough",icon:"☢️",desc:"Small modular reactors become commercially viable, reshaping the energy landscape.",impact:{energy:15},affected:["all"],bonus:{energy:8,targets:["France","Japan"]}},
+  {title:"Open-Source Frontier Model Released",icon:"🌐",desc:"A DeepSeek-class open model disrupts proprietary AI leaders overnight.",impact:{models:10},affected:["all"],bonus:{models:-12,targets:["United States"]}},
+  {title:"Undersea Cable Sabotage",icon:"🌊",desc:"Critical submarine data cables damaged. Cloud connectivity drops sharply.",impact:{infrastructure:-12},affected:["all"],bonus:{infrastructure:8,targets:["United States","China"]}},
+  {title:"India AI Mission: $2B Boost",icon:"🇮🇳",desc:"Massive government investment accelerates domestic compute and Indic language models.",impact:{},affected:[],bonus:{models:10,infrastructure:10,talent:6,targets:["India"]}},
+  {title:"Sovereign Cloud Mandates",icon:"☁️",desc:"Nations mandate local data processing. Infrastructure spending surges.",impact:{infrastructure:10,regulation:6},affected:["all"],bonus:{}},
+  {title:"Advanced Chip Export Ban",icon:"🚫",desc:"US tightens export controls. Only allied nations get cutting-edge silicon.",impact:{chips:-18},affected:["China","Turkey","South Africa"],bonus:{chips:6,targets:["United States","Japan"]}},
+  {title:"Global AI Safety Summit",icon:"🤝",desc:"International cooperation strengthens governance but slows frontier research.",impact:{regulation:10,models:-5},affected:["all"],bonus:{}},
+  {title:"Energy Grid Cyberattack",icon:"💥",desc:"Coordinated attacks on power infrastructure cause widespread disruption.",impact:{energy:-15,infrastructure:-8},affected:["all"],bonus:{energy:10,targets:["Saudi Arabia"]}},
+  {title:"Talent Training Boom",icon:"📚",desc:"Global push for AI education produces a wave of new engineers and researchers.",impact:{talent:8},affected:["all"],bonus:{talent:5,targets:["India","South Africa"]}},
+];
+
+let gameState=null;
+let selectedCountry=null;
+let watchInterval=null;
+
+// ─── SCREENS ───
+function showScreen(id){
+  ["splash","country-select","game","results"].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display="none";
+  });
+  const target=document.getElementById(id);
+  target.style.display=id==="splash"?"flex":"block";
+}
+function showSplash(){showScreen("splash")}
+
+function showCountrySelect(){
+  showScreen("country-select");
+  renderCountryGrid();
+  selectedCountry=null;
+  const btn=document.getElementById("startBtn");
+  btn.disabled=true;
+  btn.textContent="Select a Nation to Start";
+}
+
+function renderCountryGrid(){
+  const grid=document.getElementById("countryGrid");
+  grid.innerHTML="";
+  Object.entries(NATIONS).forEach(([name,n])=>{
+    const sov=calcSovereignty(n);
+    const card=document.createElement("div");
+    card.className="country-card slide-up";
+    card.style.setProperty("--cc",n.color);
+    card.innerHTML=`
+      <div style="position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;background:${n.color};filter:blur(50px);opacity:.15"></div>
+      <div class="flag">${n.flag}</div>
+      <div class="name">${name}</div>
+      <div class="desc">${n.desc}</div>
+      <div class="bars">
+        ${LEVERS.map(l=>`<div class="mini-bar">
+          <span class="mini-bar-label">${LEVER_LABELS[l]}</span>
+          <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${n[l]}%;background:${LEVER_COLORS[l]}"></div></div>
+          <span class="mini-bar-val">${n[l]}</span>
+        </div>`).join("")}
+      </div>
+      <div class="sov-line">
+        <span style="font-size:.75rem;color:var(--muted)">Sovereignty</span>
+        <span class="sov-badge">${sov}</span>
+      </div>`;
+    card.onclick=()=>{
+      document.querySelectorAll(".country-card").forEach(c=>c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedCountry=name;
+      const btn=document.getElementById("startBtn");
+      btn.disabled=false;
+      btn.textContent=`Play as ${n.flag} ${name}`;
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── GAME LOGIC ───
+function calcSovereignty(leversObj){
+  const vals=LEVERS.map(l=>typeof leversObj[l]==="number"?leversObj[l]:(leversObj.levers?leversObj.levers[l]:0));
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const min=Math.min(...vals);
+  const penalty=min<40?(40-min)*0.6:0;
+  return Math.max(0,Math.min(100,Math.round(avg-penalty)));
+}
+
+function clamp(v){return Math.max(0,Math.min(100,Math.round(v)))}
+
+function startGame(){
+  if(!selectedCountry)return;
+  const nations={};
+  Object.entries(NATIONS).forEach(([name,n])=>{
+    nations[name]={levers:{},startLevers:{},isPlayer:name===selectedCountry,prevSov:0};
+    LEVERS.forEach(l=>{nations[name].levers[l]=n[l];nations[name].startLevers[l]=n[l]});
+    nations[name].sovereignty=calcSovereignty(nations[name]);
+    nations[name].startSov=nations[name].sovereignty;
+    nations[name].prevSov=nations[name].sovereignty;
+  });
+  gameState={nations,playerCountry:selectedCountry,year:2025,turn:0,maxTurns:10,ap:5,maxAp:5,turnMoves:[],currentEvent:null,eventHistory:[],gameOver:false};
+  drawEvent();
+  showScreen("game");
+  renderGame();
+}
+
+function drawEvent(){
+  const ev={...EVENTS[Math.floor(Math.random()*EVENTS.length)]};
+  gameState.currentEvent=ev;
+  Object.entries(gameState.nations).forEach(([name,n])=>{
+    n.prevSov=n.sovereignty;
+    const isAffected=ev.affected.includes("all")||ev.affected.includes(name);
+    if(isAffected&&ev.impact){
+      LEVERS.forEach(l=>{if(ev.impact[l])n.levers[l]=clamp(n.levers[l]+ev.impact[l])});
+    }
+    if(ev.bonus&&ev.bonus.targets&&ev.bonus.targets.includes(name)){
+      LEVERS.forEach(l=>{if(ev.bonus[l]&&l!=="targets")n.levers[l]=clamp(n.levers[l]+ev.bonus[l])});
+    }
+    n.sovereignty=calcSovereignty(n);
+  });
+}
+
+function aiMove(nation,nationName){
+  const nd=NATIONS[nationName];
+  let ap=5;
+  while(ap>0){
+    let weakest=LEVERS[0],wVal=nation.levers[LEVERS[0]];
+    LEVERS.forEach(l=>{if(nation.levers[l]<wVal){weakest=l;wVal=nation.levers[l]}});
+    let target;
+    const r=Math.random();
+    if(r<0.5){
+      target=weakest;
+    }else if(r<0.75&&nd.aiStyle!=="balanced"){
+      // Focus on national strength
+      const styleMap={energy:"energy",chips:"chips",infrastructure:"infrastructure",talent:"talent",regulation:"regulation"};
+      target=styleMap[nd.aiStyle]||LEVERS[Math.floor(Math.random()*LEVERS.length)];
+    }else{
+      target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
+    }
+    const boost=Math.floor(Math.random()*7)+5;
+    nation.levers[target]=clamp(nation.levers[target]+boost);
+    ap--;
+  }
+  nation.sovereignty=calcSovereignty(nation);
+}
+
+// ─── RENDER GAME ───
+function renderGame(){
+  if(!gameState)return;
+  const gs=gameState;
+  document.getElementById("yearBadge").textContent=gs.year;
+  document.getElementById("gameTitle").innerHTML=`<span style="font-size:1.5rem">${NATIONS[gs.playerCountry].flag}</span> AI Sovereignty Race`;
+  document.getElementById("playerCountryName").textContent=gs.playerCountry;
+  document.getElementById("playerFlag").textContent=NATIONS[gs.playerCountry].flag;
+
+  // Turn dots
+  let dots="";
+  for(let i=0;i<gs.maxTurns;i++){
+    const cls=i<gs.turn?"done":i===gs.turn?"current":"";
+    dots+=`<div class="turn-dot ${cls}"></div>`;
+  }
+  document.getElementById("turnIndicator").innerHTML=dots;
+
+  renderLeaderboard();
+  renderEventCard();
+  renderAP();
+  renderLevers();
+}
+
+function renderLeaderboard(){
+  const lb=document.getElementById("leaderboard");
+  const sorted=Object.entries(gameState.nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
+  lb.innerHTML=sorted.map(([name,n],i)=>{
+    const rc=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+    const isYou=name===gameState.playerCountry;
+    const delta=n.sovereignty-n.prevSov;
+    const deltaStr=delta>0?`<span style="color:var(--green)">+${delta}</span>`:delta<0?`<span style="color:var(--red)">${delta}</span>`:"";
+    return `<div class="lb-row ${isYou?"you":""}">
+      <div class="rank ${rc}">${i+1}</div>
+      <div class="nflag">${NATIONS[name].flag}</div>
+      <div class="nname">${name}${isYou?" (You)":""}</div>
+      <div class="sbar"><div class="sbar-fill" style="width:${n.sovereignty}%;background:${NATIONS[name].color}"></div></div>
+      <div class="sscore">${n.sovereignty}</div>
+      <div class="sdelta">${deltaStr}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderEventCard(){
+  const ev=gameState.currentEvent;
+  if(!ev){document.getElementById("eventCard").innerHTML="";return}
+  const chips=[];
+  if(ev.impact){
+    Object.entries(ev.impact).forEach(([k,v])=>{
+      if(k!=="targets")chips.push(`<span class="ev-chip ${v>0?"positive":"negative"}">${LEVER_FULL[k]||k} ${v>0?"+":""}${v}</span>`);
+    });
+  }
+  const affText=ev.affected.includes("all")?"All nations":ev.affected.join(", ");
+  document.getElementById("eventCard").innerHTML=`
+    <div class="event-card slide-up">
+      <div class="ev-icon">${ev.icon||"🌍"}</div>
+      <div class="ev-title">${ev.title}</div>
+      <div class="ev-desc">${ev.desc}</div>
+      ${chips.length?`<div class="ev-impact">${chips.join("")}<span style="font-size:.72rem;color:var(--muted);margin-left:auto">Affects: ${affText}</span></div>`:""}
+    </div>`;
+}
+
+function renderAP(){
+  let dots="";
+  for(let i=0;i<gameState.maxAp;i++){
+    dots+=`<div class="ap-dot ${i>=gameState.ap?"spent":""}"></div>`;
+  }
+  document.getElementById("apDisplay").innerHTML=`
+    <span class="ap-label">Action Points: ${gameState.ap}/${gameState.maxAp}</span>
+    <div class="ap-dots">${dots}</div>
+    <span style="font-size:.75rem;color:var(--muted);margin-left:auto">+10 per lever = 1 AP</span>`;
+}
+
+function renderLevers(){
+  const panel=document.getElementById("leverPanel");
+  const n=gameState.nations[gameState.playerCountry];
+  panel.innerHTML=LEVERS.map(l=>{
+    const v=n.levers[l];
+    const sv=n.startLevers[l];
+    const diff=v-sv;
+    let deltaHtml="";
+    if(diff>0)deltaHtml=`<span class="delta-badge up">+${diff}</span>`;
+    else if(diff<0)deltaHtml=`<span class="delta-badge down">${diff}</span>`;
+    return `<div class="lever-row" id="lever-${l}">
+      <div class="lever-icon">${LEVER_ICONS[l]}</div>
+      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}</div>
+      <div class="lever-bar-wrap">
+        <div class="lever-bar">
+          <div class="lever-bar-fill" style="width:${v}%;background:linear-gradient(90deg,${LEVER_COLORS[l]}88,${LEVER_COLORS[l]})"></div>
+          <div class="lever-bar-label">${v} ${deltaHtml}</div>
+        </div>
+      </div>
+      <div class="lever-btns">
+        <button class="lever-btn" onclick="boostLever('${l}')" ${gameState.ap<=0||v>=100||gameState.gameOver?"disabled":""} title="+10 (1 AP)">+</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function boostLever(lever){
+  if(gameState.ap<=0||gameState.gameOver)return;
+  const n=gameState.nations[gameState.playerCountry];
+  if(n.levers[lever]>=100)return;
+  gameState.turnMoves.push({lever,prev:n.levers[lever]});
+  n.levers[lever]=clamp(n.levers[lever]+10);
+  n.sovereignty=calcSovereignty(n);
+  gameState.ap--;
+  // Flash animation
+  const row=document.getElementById("lever-"+lever);
+  if(row){row.classList.remove("boosted");void row.offsetWidth;row.classList.add("boosted")}
+  renderGame();
+}
+
+function undoMoves(){
+  if(!gameState.turnMoves.length)return;
+  const n=gameState.nations[gameState.playerCountry];
+  gameState.turnMoves.reverse().forEach(m=>{n.levers[m.lever]=m.prev;gameState.ap++});
+  n.sovereignty=calcSovereignty(n);
+  gameState.turnMoves=[];
+  renderGame();
+}
+
+function endTurn(){
+  if(gameState.gameOver)return;
+  // Save prev sovereignty for delta display
+  Object.values(gameState.nations).forEach(n=>{n.prevSov=n.sovereignty});
+  // AI moves
+  Object.entries(gameState.nations).forEach(([name,n])=>{
+    if(name!==gameState.playerCountry)aiMove(n,name);
+  });
+  gameState.turn++;
+  gameState.year++;
+  gameState.ap=gameState.maxAp;
+  gameState.turnMoves=[];
+  gameState.eventHistory.push(gameState.currentEvent);
+
+  // Check win
+  const winner=Object.entries(gameState.nations).find(([,n])=>n.sovereignty>=90);
+  if(winner||gameState.turn>=gameState.maxTurns){
+    gameState.gameOver=true;
+    showResults();
+    return;
+  }
+  drawEvent();
+  renderGame();
+}
+
+// ─── RESULTS ───
+function showResults(){
+  showScreen("results");
+  const gs=gameState;
+  const pn=gs.nations[gs.playerCountry];
+  const sorted=Object.entries(gs.nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
+  const playerRank=sorted.findIndex(([n])=>n===gs.playerCountry)+1;
+  const yearsPlayed=gs.turn;
+
+  // Normalized player rating
+  const improvement=pn.sovereignty-pn.startSov;
+  const difficulty=100-pn.startSov;
+  const rating=yearsPlayed>0?Math.round((improvement/Math.max(difficulty,1))*100):0;
+
+  const isWinner=playerRank===1;
+  document.getElementById("resultTitle").textContent=isWinner?"🏆 Victory!":"Race Complete";
+  document.getElementById("resultSubtitle").textContent=
+    isWinner?`${gs.playerCountry} ${NATIONS[gs.playerCountry].flag} achieved AI sovereignty leadership in ${yearsPlayed} years!`
+    :`${gs.playerCountry} ${NATIONS[gs.playerCountry].flag} finished #${playerRank} of 8 nations after ${yearsPlayed} years.`;
+  document.getElementById("finalScore").textContent=pn.sovereignty;
+  document.getElementById("finalLabel").textContent=`Sovereignty Score (started at ${pn.startSov})`;
+
+  document.getElementById("resultGrid").innerHTML=LEVERS.map(l=>{
+    const diff=pn.levers[l]-pn.startLevers[l];
+    const diffStr=diff>0?`<span class="rg-delta" style="color:var(--green)">+${diff}</span>`:diff<0?`<span class="rg-delta" style="color:var(--red)">${diff}</span>`:`<span class="rg-delta" style="color:var(--muted)">+0</span>`;
+    return `<div class="rg-item">
+      <div class="rg-val" style="color:${LEVER_COLORS[l]}">${pn.levers[l]}</div>
+      <div class="rg-lbl">${LEVER_ICONS[l]} ${LEVER_FULL[l]}</div>
+      <div>${diffStr} from ${pn.startLevers[l]}</div>
+    </div>`;
+  }).join("")+`<div class="rg-item"><div class="rg-val" style="color:var(--gold)">${rating}</div><div class="rg-lbl">Player Rating</div><div class="rg-delta" style="color:var(--muted)">Normalized for difficulty</div></div>`;
+
+  // Final standings
+  document.getElementById("finalStandings").innerHTML=sorted.map(([name,n],i)=>{
+    const isYou=name===gs.playerCountry;
+    return `<div class="final-lb-row" style="${isYou?"background:rgba(79,140,255,.08);border-radius:8px":""}">
+      <span class="flb-rank" style="color:${i===0?"var(--gold)":i===1?"#94a3b8":i===2?"#cd7f32":"var(--muted)"}">${i+1}</span>
+      <span class="flb-flag">${NATIONS[name].flag}</span>
+      <span class="flb-name">${name}${isYou?" (You)":""}</span>
+      <span class="flb-score">${n.sovereignty}</span>
+    </div>`;
+  }).join("");
+
+  saveToLeaderboard(gs.playerCountry,pn.sovereignty,rating,yearsPlayed);
+  renderHistory();
+}
+
+function saveToLeaderboard(country,sov,rating,years){
+  const lb=JSON.parse(localStorage.getItem("ai_sov_lb")||"[]");
+  lb.push({country,sov,rating,years,date:new Date().toLocaleDateString(),flag:NATIONS[country].flag});
+  lb.sort((a,b)=>b.rating-a.rating);
+  if(lb.length>20)lb.length=20;
+  localStorage.setItem("ai_sov_lb",JSON.stringify(lb));
+}
+
+function renderHistory(){
+  const lb=JSON.parse(localStorage.getItem("ai_sov_lb")||"[]");
+  const list=document.getElementById("historyList");
+  if(!lb.length){list.innerHTML="<p style='color:var(--muted);padding:8px;font-size:.9rem'>No games played yet.</p>";return}
+  list.innerHTML=lb.map((e,i)=>`<div class="lbh-row">
+    <span>${i+1}. ${e.flag} ${e.country}</span>
+    <span>Sov: ${e.sov} | Rating: ${e.rating} | ${e.years}yr | ${e.date}</span>
+  </div>`).join("");
+}
+
+// ─── WATCH MODE ───
+function startWatchMode(){
+  const overlay=document.getElementById("watch-overlay");
+  overlay.classList.add("active");
+  const nations={};
+  Object.entries(NATIONS).forEach(([name,n])=>{
+    nations[name]={levers:{},sovereignty:0};
+    LEVERS.forEach(l=>{nations[name].levers[l]=n[l]});
+    nations[name].sovereignty=calcSovereignty(nations[name]);
+  });
+  let year=2025;
+  document.getElementById("watchEvent").textContent="Simulation starting...";
+  renderWatchBars(nations,year);
+
+  watchInterval=setInterval(()=>{
+    year++;
+    if(year>2035){
+      clearInterval(watchInterval);
+      const winner=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty)[0];
+      document.getElementById("watchEvent").innerHTML=`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins with sovereignty ${winner[1].sovereignty}!</strong>`;
+      return;
+    }
+    const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    document.getElementById("watchEvent").innerHTML=`${ev.icon||"🌍"} ${ev.title}`;
+    Object.entries(nations).forEach(([name,n])=>{
+      const isAffected=ev.affected.includes("all")||ev.affected.includes(name);
+      if(isAffected&&ev.impact){
+        LEVERS.forEach(l=>{if(ev.impact[l])n.levers[l]=clamp(n.levers[l]+ev.impact[l])});
+      }
+      if(ev.bonus&&ev.bonus.targets&&ev.bonus.targets.includes(name)){
+        LEVERS.forEach(l=>{if(ev.bonus[l]&&l!=="targets")n.levers[l]=clamp(n.levers[l]+ev.bonus[l])});
+      }
+      // AI
+      let ap=5;
+      while(ap>0){
+        let weakest=LEVERS[0],wVal=n.levers[LEVERS[0]];
+        LEVERS.forEach(l=>{if(n.levers[l]<wVal){weakest=l;wVal=n.levers[l]}});
+        const nd=NATIONS[name];
+        const r=Math.random();
+        let target;
+        if(r<0.5)target=weakest;
+        else if(r<0.75&&nd.aiStyle!=="balanced"){
+          const sm={energy:"energy",chips:"chips",infrastructure:"infrastructure",talent:"talent",regulation:"regulation"};
+          target=sm[nd.aiStyle]||LEVERS[Math.floor(Math.random()*LEVERS.length)];
+        }else target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
+        n.levers[target]=clamp(n.levers[target]+Math.floor(Math.random()*7)+5);
+        ap--;
+      }
+      n.sovereignty=calcSovereignty(n);
+    });
+    renderWatchBars(nations,year);
+  },1500);
+}
+
+function renderWatchBars(nations,year){
+  document.getElementById("watchYear").textContent=year;
+  const sorted=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
+  document.getElementById("watchBars").innerHTML=sorted.map(([name,n],i)=>{
+    const isFirst=i===0;
+    return `<div class="watch-row">
+      <div class="wflag">${NATIONS[name].flag}</div>
+      <div class="wname" style="${isFirst?"color:var(--gold);font-weight:800":""}">${name}</div>
+      <div class="wbar">
+        <div class="wbar-fill" style="width:${n.sovereignty}%;background:linear-gradient(90deg,${NATIONS[name].color}88,${NATIONS[name].color})"></div>
+        <div class="wbar-label">${n.sovereignty}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function stopWatch(){
+  clearInterval(watchInterval);watchInterval=null;
+  document.getElementById("watch-overlay").classList.remove("active");
+}
+
+// ─── UTILS ───
+function showRules(){document.getElementById("rulesModal").classList.add("active")}
+function hideRules(){document.getElementById("rulesModal").classList.remove("active")}
+function confirmQuit(){if(confirm("Quit current game?"))showCountrySelect()}
+</script>
+</body>
+</html>
