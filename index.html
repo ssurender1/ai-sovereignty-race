@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>AI Sovereignty Race</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -34,25 +34,30 @@ h1,h2,h3{font-weight:700}
 .btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
 
 /* ─── SPLASH ─── */
-#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;background:var(--bg)}
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;padding-bottom:calc(2rem + env(safe-area-inset-bottom,0px));background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+@media(max-height:800px){#splash{justify-content:flex-start;padding-top:3rem}}
 #splash::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(79,140,255,.12),transparent 60%),radial-gradient(circle at 30% 70%,rgba(168,85,247,.08),transparent 50%),radial-gradient(circle at 70% 60%,rgba(255,215,0,.06),transparent 50%)}
 #splash>*{position:relative;z-index:1}
 #splash h1{font-size:clamp(2rem,5vw,3.5rem);background:linear-gradient(135deg,#4f8cff 0%,#a78bfa 40%,#ffd700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem;letter-spacing:-1px}
 #splash .subtitle{font-size:clamp(.9rem,2vw,1.15rem);color:var(--muted);margin-bottom:2rem;max-width:600px;line-height:1.6}
-.cake-wrap{perspective:800px;margin:1rem 0 1.5rem}
+.cake-wrap{perspective:800px;margin:.8rem 0 1rem}
+@media(max-height:800px){.cake-wrap{margin:.3rem 0 .5rem}}
+@media(max-height:800px){#splash .subtitle{margin-bottom:1rem}#splash h1{margin-bottom:.1rem}}
 .cake-diagram{display:flex;flex-direction:column;align-items:center;gap:5px;transform:rotateX(8deg)}
 .cake-layer{padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:700;color:#fff;text-align:center;opacity:0;animation:cakeSlide .5s forwards;letter-spacing:.5px;box-shadow:0 2px 12px rgba(0,0,0,.3);position:relative;overflow:hidden}
 .cake-layer::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 3s infinite}
 @keyframes shimmer{0%{left:-100%}100%{left:200%}}
-.cake-layer:nth-child(1){background:linear-gradient(135deg,#f59e0b,#d97706);animation-delay:.1s;width:300px}
-.cake-layer:nth-child(2){background:linear-gradient(135deg,#8b5cf6,#7c3aed);animation-delay:.2s;width:275px}
-.cake-layer:nth-child(3){background:linear-gradient(135deg,#06b6d4,#0891b2);animation-delay:.3s;width:250px}
-.cake-layer:nth-child(4){background:linear-gradient(135deg,#22c55e,#16a34a);animation-delay:.4s;width:225px}
-.cake-layer:nth-child(5){background:linear-gradient(135deg,#3b82f6,#2563eb);animation-delay:.5s;width:200px}
-.cake-layer:nth-child(6){background:linear-gradient(135deg,#ef4444,#dc2626);animation-delay:.6s;width:175px}
-.cake-layer:nth-child(7){background:linear-gradient(135deg,#ec4899,#db2777);animation-delay:.7s;width:150px}
+.cake-layer:nth-child(1){background:linear-gradient(135deg,#f59e0b,#d97706);animation-delay:.1s;width:min(300px,70vw)}
+.cake-layer:nth-child(2){background:linear-gradient(135deg,#8b5cf6,#7c3aed);animation-delay:.2s;width:min(275px,65vw)}
+.cake-layer:nth-child(3){background:linear-gradient(135deg,#06b6d4,#0891b2);animation-delay:.3s;width:min(250px,60vw)}
+.cake-layer:nth-child(4){background:linear-gradient(135deg,#22c55e,#16a34a);animation-delay:.4s;width:min(225px,55vw)}
+.cake-layer:nth-child(5){background:linear-gradient(135deg,#3b82f6,#2563eb);animation-delay:.5s;width:min(200px,50vw)}
+.cake-layer:nth-child(6){background:linear-gradient(135deg,#ef4444,#dc2626);animation-delay:.6s;width:min(175px,45vw)}
+.cake-layer:nth-child(7){background:linear-gradient(135deg,#ec4899,#db2777);animation-delay:.7s;width:min(150px,40vw)}
 @keyframes cakeSlide{from{opacity:0;transform:translateY(15px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.splash-flags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;font-size:2rem}
+@media(max-height:800px){.cake-layer{padding:7px 14px;font-size:.78rem}.cake-diagram{gap:3px}}
+.splash-flags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1rem 0;font-size:2rem}
+@media(max-height:800px){.splash-flags{margin:.5rem 0;font-size:1.6rem;gap:8px}}
 .splash-flags span{animation:flagBounce 2s infinite;display:inline-block}
 .splash-flags span:nth-child(1){animation-delay:0s}
 .splash-flags span:nth-child(2){animation-delay:.15s}
@@ -65,7 +70,8 @@ h1,h2,h3{font-weight:700}
 @keyframes flagBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .splash-info{font-size:.88rem;color:var(--muted);margin:1rem 0;max-width:560px;line-height:1.6}
 .splash-btns{display:flex;gap:14px;margin-top:1.2rem;flex-wrap:wrap;justify-content:center}
-.splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px}
+.splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px;padding-bottom:2rem}
+@media(max-height:800px){.splash-info{font-size:.82rem;margin:.5rem 0}.splash-btns{margin-top:.8rem}.splash-credit{margin-top:1rem;padding-bottom:3rem}}
 
 /* ─── COUNTRY SELECT ─── */
 #country-select{display:none;padding:2rem;max-width:1000px;margin:0 auto;text-align:center}
