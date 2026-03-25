@@ -286,7 +286,7 @@ h1,h2,h3{font-weight:700}
   <div class="game-layout">
     <div class="left-col">
       <div class="panel" id="leaderboardPanel">
-        <h3>Sovereignty Leaderboard</h3>
+        <h3>Rankings — % Growth from Baseline</h3>
         <div id="leaderboard"></div>
       </div>
       <div class="panel" id="eventPanel">
@@ -466,6 +466,11 @@ const EVENTS=[
   {title:"Global AI Safety Summit",icon:"🤝",desc:"International cooperation strengthens governance but slows frontier research.",impact:{regulation:10,models:-5},affected:["all"],bonus:{}},
   {title:"Energy Grid Cyberattack",icon:"💥",desc:"Coordinated attacks on power infrastructure cause widespread disruption.",impact:{energy:-15,infrastructure:-8},affected:["all"],bonus:{energy:10,targets:["Saudi Arabia"]}},
   {title:"Talent Training Boom",icon:"📚",desc:"Global push for AI education produces a wave of new engineers and researchers.",impact:{talent:8},affected:["all"],bonus:{talent:5,targets:["India","South Africa"]}},
+  {title:"Compute Cost Collapse",icon:"💡",desc:"Open silicon initiative slashes GPU costs. Emerging nations close the hardware gap fast.",impact:{chips:12,infrastructure:8},affected:["India","South Africa","Turkey","Saudi Arabia"],bonus:{chips:-6,targets:["United States"]}},
+  {title:"Regulatory Overreach Backfires",icon:"📋",desc:"Heavy AI laws in leading nations spark talent exodus and slow deployment timelines.",impact:{applications:-10,talent:-8},affected:["United States","France"],bonus:{talent:10,applications:6,targets:["India","Saudi Arabia","Turkey"]}},
+  {title:"Tech Transfer Agreements Signed",icon:"🤝",desc:"Bilateral deals grant emerging economies access to frontier AI tools and cloud infra.",impact:{models:8,infrastructure:10},affected:["India","South Africa","Turkey","Saudi Arabia"],bonus:{}},
+  {title:"US Tech Monopoly Backlash",icon:"🛑",desc:"International coalition restricts American AI platforms, spurring local alternatives.",impact:{models:-10,applications:-8},affected:["United States"],bonus:{models:8,applications:6,targets:["China","India","France"]}},
+  {title:"Brain Drain Reversal",icon:"🔄",desc:"Diaspora AI researchers return home as emerging hubs offer equity and purpose.",impact:{talent:14,models:6},affected:["India","South Africa","Saudi Arabia","Turkey"],bonus:{}},
 ];
 
 let gameState=null;
@@ -549,7 +554,7 @@ function startGame(){
     nations[name].startSov=nations[name].sovereignty;
     nations[name].prevSov=nations[name].sovereignty;
   });
-  gameState={nations,playerCountry:selectedCountry,year:2025,turn:0,maxTurns:10,ap:5,maxAp:5,turnMoves:[],currentEvent:null,eventHistory:[],gameOver:false};
+  gameState={nations,playerCountry:selectedCountry,year:2026,turn:0,maxTurns:10,ap:5,maxAp:5,turnMoves:[],currentEvent:null,eventHistory:[],gameOver:false};
   drawEvent();
   showScreen("game");
   renderGame();
@@ -573,6 +578,8 @@ function drawEvent(){
 
 function aiMove(nation,nationName){
   const nd=NATIONS[nationName];
+  // Catch-up: weaker nations invest more aggressively
+  const catchupMult=nation.sovereignty<40?1.8:nation.sovereignty<55?1.4:nation.sovereignty<70?1.15:1.0;
   let ap=5;
   while(ap>0){
     let weakest=LEVERS[0],wVal=nation.levers[LEVERS[0]];
@@ -582,13 +589,12 @@ function aiMove(nation,nationName){
     if(r<0.5){
       target=weakest;
     }else if(r<0.75&&nd.aiStyle!=="balanced"){
-      // Focus on national strength
       const styleMap={energy:"energy",chips:"chips",infrastructure:"infrastructure",talent:"talent",regulation:"regulation"};
       target=styleMap[nd.aiStyle]||LEVERS[Math.floor(Math.random()*LEVERS.length)];
     }else{
       target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
     }
-    const boost=Math.floor(Math.random()*7)+5;
+    const boost=Math.round((Math.floor(Math.random()*7)+5)*catchupMult);
     nation.levers[target]=clamp(nation.levers[target]+boost);
     ap--;
   }
@@ -620,18 +626,21 @@ function renderGame(){
 
 function renderLeaderboard(){
   const lb=document.getElementById("leaderboard");
-  const sorted=Object.entries(gameState.nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
-  lb.innerHTML=sorted.map(([name,n],i)=>{
+  const sorted=Object.entries(gameState.nations)
+    .map(([name,n])=>[name,n,Math.round((n.sovereignty-n.startSov)/Math.max(n.startSov,1)*100)])
+    .sort((a,b)=>b[2]-a[2]);
+  lb.innerHTML=sorted.map(([name,n,imp],i)=>{
     const rc=i===0?"gold":i===1?"silver":i===2?"bronze":"";
     const isYou=name===gameState.playerCountry;
     const delta=n.sovereignty-n.prevSov;
     const deltaStr=delta>0?`<span style="color:var(--green)">+${delta}</span>`:delta<0?`<span style="color:var(--red)">${delta}</span>`:"";
+    const impStr=imp>0?`<span style="color:var(--green);font-weight:800">+${imp}%</span>`:imp<0?`<span style="color:var(--red);font-weight:800">${imp}%</span>`:`<span style="color:var(--muted)">0%</span>`;
     return `<div class="lb-row ${isYou?"you":""}">
       <div class="rank ${rc}">${i+1}</div>
       <div class="nflag">${NATIONS[name].flag}</div>
       <div class="nname">${name}${isYou?" (You)":""}</div>
       <div class="sbar"><div class="sbar-fill" style="width:${n.sovereignty}%;background:${NATIONS[name].color}"></div></div>
-      <div class="sscore">${n.sovereignty}</div>
+      <div class="sscore">${impStr}</div>
       <div class="sdelta">${deltaStr}</div>
     </div>`;
   }).join("");
@@ -730,9 +739,8 @@ function endTurn(){
   gameState.turnMoves=[];
   gameState.eventHistory.push(gameState.currentEvent);
 
-  // Check win
-  const winner=Object.entries(gameState.nations).find(([,n])=>n.sovereignty>=90);
-  if(winner||gameState.turn>=gameState.maxTurns){
+  // Check win — improvement-based, no early exit
+  if(gameState.turn>=gameState.maxTurns){
     gameState.gameOver=true;
     showResults();
     return;
@@ -746,22 +754,22 @@ function showResults(){
   showScreen("results");
   const gs=gameState;
   const pn=gs.nations[gs.playerCountry];
-  const sorted=Object.entries(gs.nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
+  // Sort by % improvement from baseline — the actual win condition
+  const sorted=Object.entries(gs.nations)
+    .map(([name,n])=>[name,n,Math.round((n.sovereignty-n.startSov)/Math.max(n.startSov,1)*100)])
+    .sort((a,b)=>b[2]-a[2]);
   const playerRank=sorted.findIndex(([n])=>n===gs.playerCountry)+1;
   const yearsPlayed=gs.turn;
-
-  // Normalized player rating
-  const improvement=pn.sovereignty-pn.startSov;
-  const difficulty=100-pn.startSov;
-  const rating=yearsPlayed>0?Math.round((improvement/Math.max(difficulty,1))*100):0;
+  const pImp=Math.round((pn.sovereignty-pn.startSov)/Math.max(pn.startSov,1)*100);
+  const rating=pImp;
 
   const isWinner=playerRank===1;
   document.getElementById("resultTitle").textContent=isWinner?"🏆 Victory!":"Race Complete";
   document.getElementById("resultSubtitle").textContent=
-    isWinner?`${gs.playerCountry} ${NATIONS[gs.playerCountry].flag} achieved AI sovereignty leadership in ${yearsPlayed} years!`
-    :`${gs.playerCountry} ${NATIONS[gs.playerCountry].flag} finished #${playerRank} of 8 nations after ${yearsPlayed} years.`;
-  document.getElementById("finalScore").textContent=pn.sovereignty;
-  document.getElementById("finalLabel").textContent=`Sovereignty Score (started at ${pn.startSov})`;
+    isWinner?`${NATIONS[gs.playerCountry].flag} ${gs.playerCountry} grew the fastest — +${pImp}% improvement from baseline!`
+    :`${NATIONS[gs.playerCountry].flag} ${gs.playerCountry} finished #${playerRank} of 8 nations (+${pImp}% growth in ${yearsPlayed} years).`;
+  document.getElementById("finalScore").textContent=`+${pImp}%`;
+  document.getElementById("finalLabel").textContent=`Growth from baseline (${pn.startSov} → ${pn.sovereignty} sovereignty)`;
 
   document.getElementById("resultGrid").innerHTML=LEVERS.map(l=>{
     const diff=pn.levers[l]-pn.startLevers[l];
@@ -774,13 +782,13 @@ function showResults(){
   }).join("")+`<div class="rg-item"><div class="rg-val" style="color:var(--gold)">${rating}</div><div class="rg-lbl">Player Rating</div><div class="rg-delta" style="color:var(--muted)">Normalized for difficulty</div></div>`;
 
   // Final standings
-  document.getElementById("finalStandings").innerHTML=sorted.map(([name,n],i)=>{
+  document.getElementById("finalStandings").innerHTML=sorted.map(([name,n,imp],i)=>{
     const isYou=name===gs.playerCountry;
     return `<div class="final-lb-row" style="${isYou?"background:rgba(79,140,255,.08);border-radius:8px":""}">
       <span class="flb-rank" style="color:${i===0?"var(--gold)":i===1?"#94a3b8":i===2?"#cd7f32":"var(--muted)"}">${i+1}</span>
       <span class="flb-flag">${NATIONS[name].flag}</span>
       <span class="flb-name">${name}${isYou?" (You)":""}</span>
-      <span class="flb-score">${n.sovereignty}</span>
+      <span class="flb-score" style="color:${imp>0?"var(--green)":imp<0?"var(--red)":"var(--muted)"}">${imp>0?"+":""}${imp}%</span>
     </div>`;
   }).join("");
 
@@ -812,20 +820,23 @@ function startWatchMode(){
   overlay.classList.add("active");
   const nations={};
   Object.entries(NATIONS).forEach(([name,n])=>{
-    nations[name]={levers:{},sovereignty:0};
+    nations[name]={levers:{},sovereignty:0,startSov:0};
     LEVERS.forEach(l=>{nations[name].levers[l]=n[l]});
     nations[name].sovereignty=calcSovereignty(nations[name]);
+    nations[name].startSov=nations[name].sovereignty;
   });
-  let year=2025;
-  document.getElementById("watchEvent").textContent="Simulation starting...";
+  let year=2026;
+  document.getElementById("watchEvent").textContent="Simulation starting 2026…";
   renderWatchBars(nations,year);
 
   watchInterval=setInterval(()=>{
     year++;
-    if(year>2035){
+    if(year>2036){
       clearInterval(watchInterval);
-      const winner=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty)[0];
-      document.getElementById("watchEvent").innerHTML=`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins with sovereignty ${winner[1].sovereignty}!</strong>`;
+      const winner=Object.entries(nations)
+        .map(([n,d])=>[n,d,Math.round((d.sovereignty-d.startSov)/Math.max(d.startSov,1)*100)])
+        .sort((a,b)=>b[2]-a[2])[0];
+      document.getElementById("watchEvent").innerHTML=`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins! +${winner[2]}% growth</strong>`;
       for(let i=0;i<4;i++)setTimeout(()=>{const el=document.getElementById("watchEvent");const r=el.getBoundingClientRect();explodeAt(r.left+r.width/2,r.top+r.height/2);},i*300);
       return;
     }
@@ -840,7 +851,8 @@ function startWatchMode(){
       if(ev.bonus&&ev.bonus.targets&&ev.bonus.targets.includes(name)){
         LEVERS.forEach(l=>{if(ev.bonus[l]&&l!=="targets")n.levers[l]=clamp(n.levers[l]+ev.bonus[l])});
       }
-      // AI
+      // AI with catch-up mechanic
+      const catchM=n.sovereignty<40?1.8:n.sovereignty<55?1.4:n.sovereignty<70?1.15:1.0;
       let ap=5;
       while(ap>0){
         let weakest=LEVERS[0],wVal=n.levers[LEVERS[0]];
@@ -853,7 +865,7 @@ function startWatchMode(){
           const sm={energy:"energy",chips:"chips",infrastructure:"infrastructure",talent:"talent",regulation:"regulation"};
           target=sm[nd.aiStyle]||LEVERS[Math.floor(Math.random()*LEVERS.length)];
         }else target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
-        n.levers[target]=clamp(n.levers[target]+Math.floor(Math.random()*7)+5);
+        n.levers[target]=clamp(n.levers[target]+Math.round((Math.floor(Math.random()*7)+5)*catchM));
         ap--;
       }
       n.sovereignty=calcSovereignty(n);
@@ -864,15 +876,19 @@ function startWatchMode(){
 
 function renderWatchBars(nations,year){
   document.getElementById("watchYear").textContent=year;
-  const sorted=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty);
-  document.getElementById("watchBars").innerHTML=sorted.map(([name,n],i)=>{
+  const sorted=Object.entries(nations)
+    .map(([name,n])=>[name,n,Math.round((n.sovereignty-n.startSov)/Math.max(n.startSov,1)*100)])
+    .sort((a,b)=>b[2]-a[2]);
+  document.getElementById("watchBars").innerHTML=sorted.map(([name,n,imp],i)=>{
     const isFirst=i===0;
+    // Bar width = absolute sovereignty; label = % improvement
+    const impLabel=imp>0?`+${imp}%`:imp<0?`${imp}%`:"0%`;
     return `<div class="watch-row">
       <div class="wflag">${NATIONS[name].flag}</div>
       <div class="wname" style="${isFirst?"color:var(--gold);font-weight:800":""}">${name}</div>
       <div class="wbar">
         <div class="wbar-fill" style="width:${n.sovereignty}%;background:linear-gradient(90deg,${NATIONS[name].color}88,${NATIONS[name].color})"></div>
-        <div class="wbar-label">${n.sovereignty}</div>
+        <div class="wbar-label" style="color:${imp>0?"#22c55e":imp<0?"#ef4444":"#fff"}">${impLabel}</div>
       </div>
     </div>`;
   }).join("");
