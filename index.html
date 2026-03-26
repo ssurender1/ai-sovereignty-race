@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>AI Sovereignty Race</title>
+<title>AI Nation</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -70,6 +70,9 @@ h1,h2,h3{font-weight:700}
 @keyframes flagBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .splash-info{font-size:.88rem;color:var(--muted);margin:1rem 0;max-width:560px;line-height:1.6}
 .splash-btns{display:flex;gap:14px;margin-top:1.2rem;flex-wrap:wrap;justify-content:center}
+.how-to-play{display:flex;flex-direction:column;gap:7px;margin:1rem 0;max-width:480px;width:100%}
+.htp-step{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 14px;font-size:.85rem;color:var(--text);text-align:left}
+.htp-icon{font-size:1.2rem;flex-shrink:0}
 .splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px;padding-bottom:2rem}
 @media(max-height:800px){.splash-info{font-size:.82rem;margin:.5rem 0}.splash-btns{margin-top:.8rem}.splash-credit{margin-top:1rem;padding-bottom:3rem}}
 
@@ -237,8 +240,8 @@ h1,h2,h3{font-weight:700}
 
 <!-- SPLASH -->
 <div id="splash" class="screen">
-  <h1>AI Sovereignty Race</h1>
-  <p class="subtitle">Guide a nation to AI independence across Jensen Huang's 5-layer stack, plus Regulation & Talent</p>
+  <h1>AI Nation</h1>
+  <p class="subtitle">Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first.</p>
   <div class="splash-flags">
     <span>🇺🇸</span><span>🇨🇳</span><span>🇮🇳</span><span>🇯🇵</span><span>🇸🇦</span><span>🇹🇷</span><span>🇿🇦</span><span>🇫🇷</span>
   </div>
@@ -253,7 +256,12 @@ h1,h2,h3{font-weight:700}
       <div class="cake-layer">Energy & Power Plants</div>
     </div>
   </div>
-  <p class="splash-info">Inspired by NVIDIA CEO Jensen Huang's "5-Layer AI Cake." Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first.</p>
+  <div class="how-to-play">
+    <div class="htp-step"><span class="htp-icon">🏳️</span><span>Pick a nation — each has unique strengths &amp; hard limits</span></div>
+    <div class="htp-step"><span class="htp-icon">⚡</span><span>Spend <strong>5 Action Points/year</strong> on 7 sovereignty levers</span></div>
+    <div class="htp-step"><span class="htp-icon">🌍</span><span>Survive random global events that shake every nation</span></div>
+    <div class="htp-step"><span class="htp-icon">🏆</span><span>Win by <strong>% improvement</strong> — so any nation can beat the US</span></div>
+  </div>
   <div class="splash-btns">
     <button class="btn btn-primary" onclick="showCountrySelect()">Play the Game</button>
     <button class="btn btn-gold" onclick="startWatchMode()">Watch the Race</button>
@@ -337,7 +345,7 @@ h1,h2,h3{font-weight:700}
 
 <!-- WATCH MODE -->
 <div id="watch-overlay">
-  <div class="watch-title">AI Sovereignty Race &mdash; Simulation</div>
+  <div class="watch-title">AI Nation &mdash; Simulation</div>
   <div class="watch-year" id="watchYear">2025</div>
   <div class="watch-event" id="watchEvent"></div>
   <div class="watch-bars" id="watchBars"></div>
@@ -666,7 +674,7 @@ function renderGame(){
   if(!gameState)return;
   const gs=gameState;
   document.getElementById("yearBadge").textContent=gs.year;
-  document.getElementById("gameTitle").innerHTML=`<span style="font-size:1.5rem">${NATIONS[gs.playerCountry].flag}</span> AI Sovereignty Race`;
+  document.getElementById("gameTitle").innerHTML=`<span style="font-size:1.5rem">${NATIONS[gs.playerCountry].flag}</span> AI Nation`;
   document.getElementById("playerCountryName").textContent=gs.playerCountry;
   document.getElementById("playerFlag").textContent=NATIONS[gs.playerCountry].flag;
 
