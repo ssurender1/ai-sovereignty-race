@@ -22,7 +22,7 @@ h1,h2,h3{font-weight:700}
 .screen{position:relative;z-index:1}
 
 /* Buttons */
-.btn{padding:12px 28px;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.btn{padding:12px 28px;border:none;border-radius:10px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;touch-action:manipulation}
 .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .4s}
 .btn:hover::after{transform:translateX(100%)}
 .btn-primary{background:linear-gradient(135deg,#4f8cff,#3b6fdb);color:#fff;box-shadow:0 4px 20px rgba(79,140,255,.3)}
@@ -36,7 +36,7 @@ h1,h2,h3{font-weight:700}
 /* ─── SPLASH ─── */
 #splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;padding-bottom:calc(2rem + env(safe-area-inset-bottom,0px));background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 @media(max-height:800px){#splash{justify-content:flex-start;padding-top:3rem}}
-#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(79,140,255,.12),transparent 60%),radial-gradient(circle at 30% 70%,rgba(168,85,247,.08),transparent 50%),radial-gradient(circle at 70% 60%,rgba(255,215,0,.06),transparent 50%)}
+#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(79,140,255,.12),transparent 60%),radial-gradient(circle at 30% 70%,rgba(168,85,247,.08),transparent 50%),radial-gradient(circle at 70% 60%,rgba(255,215,0,.06),transparent 50%);pointer-events:none}
 #splash>*{position:relative;z-index:1}
 #splash h1{font-size:clamp(2rem,5vw,3.5rem);background:linear-gradient(135deg,#4f8cff 0%,#a78bfa 40%,#ffd700 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem;letter-spacing:-1px}
 #splash .subtitle{font-size:clamp(.9rem,2vw,1.15rem);color:var(--muted);margin-bottom:2rem;max-width:600px;line-height:1.6}
