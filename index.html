@@ -353,7 +353,7 @@ h1,h2,h3{font-weight:700}
       <li>You control <strong>one nation</strong>. The other 7 nations race via AI strategy.</li>
       <li>Each turn = <strong>1 year</strong>. The game spans <strong>10 years</strong> (2025&ndash;2035).</li>
       <li>You get <strong style="color:var(--gold)">5 Action Points</strong> per turn to boost your 7 sovereignty levers.</li>
-      <li>Each <strong>+10 boost</strong> to a lever costs <strong style="color:var(--gold)">1 AP</strong>.</li>
+      <li>Each lever boost costs <strong style="color:var(--gold)">1 AP</strong>. The gain depends on your country's strengths — from <strong>+3</strong> (weak lever) to <strong>+16</strong> (power path). Check the button color: 🟢 high · 🟡 medium · 🔴 low.</li>
       <li>A <strong style="color:#a78bfa">random global event</strong> each year affects all nations differently.</li>
       <li><strong>Sovereignty Score</strong> = average of all 7 levers, minus a penalty for your weakest lever.</li>
       <li>First nation to <strong>85+ sovereignty</strong> wins. After 10 years, highest score wins.</li>
@@ -734,7 +734,7 @@ function renderAP(){
   document.getElementById("apDisplay").innerHTML=`
     <span class="ap-label">Action Points: ${gameState.ap}/${gameState.maxAp}</span>
     <div class="ap-dots">${dots}</div>
-    <span style="font-size:.75rem;color:var(--muted);margin-left:auto">+10 per lever = 1 AP</span>`;
+    <span style="font-size:.75rem;color:var(--muted);margin-left:auto">1 AP per boost — gain varies by country</span>`;
 }
 
 function getLeverBlock(lever,country,levers){
