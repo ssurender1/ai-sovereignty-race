@@ -76,7 +76,7 @@ h1,h2,h3{font-weight:700}
 .sov-btn{background:none;border:1px solid rgba(79,140,255,.5);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.8rem;cursor:pointer;white-space:nowrap}
 .sov-btn:hover{background:rgba(79,140,255,.1)}
 #sovModal.active{display:flex}
-.splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px;padding-bottom:2rem}
+.splash-credit{font-size:.8rem;color:var(--muted);margin-top:1.5rem;letter-spacing:.3px;padding-bottom:2rem;line-height:1.8;text-align:center}
 @media(max-height:800px){.splash-info{font-size:.82rem;margin:.5rem 0}.splash-btns{margin-top:.8rem}.splash-credit{margin-top:1rem;padding-bottom:3rem}}
 
 /* ─── COUNTRY SELECT ─── */
@@ -244,7 +244,7 @@ h1,h2,h3{font-weight:700}
 <!-- SPLASH -->
 <div id="splash" class="screen">
   <h1>AI Nation</h1>
-  <p class="subtitle">Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first. <button class="sov-btn" onclick="document.getElementById('sovModal').classList.add('active')">What is AI Sovereignty? ↗</button></p>
+  <p class="subtitle">Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first. <button class="sov-btn" onclick="document.getElementById('sovModal').style.display='flex'">What is AI Sovereignty? ↗</button></p>
   <div class="how-to-play">
     <div class="htp-step"><span class="htp-icon">🏳️</span><span>Pick a nation — each has unique strengths &amp; hard limits</span></div>
     <div class="htp-step"><span class="htp-icon">⚡</span><span>Spend <strong>5 Action Points/year</strong> on 7 sovereignty levers</span></div>
@@ -269,7 +269,7 @@ h1,h2,h3{font-weight:700}
     <button class="btn btn-primary" onclick="showCountrySelect()">Play the Game</button>
     <button class="btn btn-gold" onclick="startWatchMode()">Watch the Race</button>
   </div>
-  <p class="splash-credit">Stanford TECH 41 &mdash; Building AI Products Through Rapid Prototyping &mdash; Sudeep Surender, 2026</p>
+  <p class="splash-credit"><span style="color:#a78bfa">Inspired by NVIDIA CEO Jensen Huang's 5-Layer AI Stack</span><br><span style="color:#7888a8">Stanford TECH 41 &mdash; Building AI Products Through Rapid Prototyping &mdash; Sudeep Surender, 2026</span></p>
 </div>
 
 <!-- COUNTRY SELECT -->
@@ -357,7 +357,7 @@ h1,h2,h3{font-weight:700}
 <canvas id="boom-canvas"></canvas>
 
 <!-- AI SOVEREIGNTY MODAL -->
-<div id="sovModal" style="display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,.85);backdrop-filter:blur(5px)">
+<div id="sovModal" style="position:fixed;inset:0;z-index:160;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);display:none">
   <div class="rules-box" style="max-width:580px">
     <h2>🌐 What is AI Sovereignty?</h2>
     <p style="color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:1rem">
@@ -382,7 +382,7 @@ h1,h2,h3{font-weight:700}
     <p style="color:var(--muted);font-size:.88rem;line-height:1.6;font-style:italic">
       Inspired by NVIDIA CEO Jensen Huang's "5-Layer AI Cake" framework.
     </p>
-    <button class="btn btn-primary" style="margin-top:1.2rem;width:100%" onclick="document.getElementById('sovModal').classList.remove('active');document.getElementById('sovModal').style.display='none'">Got it!</button>
+    <button class="btn btn-primary" style="margin-top:1.2rem;width:100%" onclick="document.getElementById('sovModal').style.display='none'">Got it!</button>
   </div>
 </div>
 
