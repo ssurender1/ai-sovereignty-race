@@ -47,13 +47,13 @@ h1,h2,h3{font-weight:700}
 .cake-layer{padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:700;color:#fff;text-align:center;opacity:0;animation:cakeSlide .5s forwards;letter-spacing:.5px;box-shadow:0 2px 12px rgba(0,0,0,.3);position:relative;overflow:hidden}
 .cake-layer::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 3s infinite}
 @keyframes shimmer{0%{left:-100%}100%{left:200%}}
-.cake-layer:nth-child(1){background:linear-gradient(135deg,#f59e0b,#d97706);animation-delay:.1s;width:min(300px,70vw)}
-.cake-layer:nth-child(2){background:linear-gradient(135deg,#8b5cf6,#7c3aed);animation-delay:.2s;width:min(275px,65vw)}
-.cake-layer:nth-child(3){background:linear-gradient(135deg,#06b6d4,#0891b2);animation-delay:.3s;width:min(250px,60vw)}
+.cake-layer:nth-child(1){background:linear-gradient(135deg,#ec4899,#db2777);animation-delay:.7s;width:min(150px,40vw)}
+.cake-layer:nth-child(2){background:linear-gradient(135deg,#ef4444,#dc2626);animation-delay:.6s;width:min(175px,45vw)}
+.cake-layer:nth-child(3){background:linear-gradient(135deg,#3b82f6,#2563eb);animation-delay:.5s;width:min(200px,50vw)}
 .cake-layer:nth-child(4){background:linear-gradient(135deg,#22c55e,#16a34a);animation-delay:.4s;width:min(225px,55vw)}
-.cake-layer:nth-child(5){background:linear-gradient(135deg,#3b82f6,#2563eb);animation-delay:.5s;width:min(200px,50vw)}
-.cake-layer:nth-child(6){background:linear-gradient(135deg,#ef4444,#dc2626);animation-delay:.6s;width:min(175px,45vw)}
-.cake-layer:nth-child(7){background:linear-gradient(135deg,#ec4899,#db2777);animation-delay:.7s;width:min(150px,40vw)}
+.cake-layer:nth-child(5){background:linear-gradient(135deg,#06b6d4,#0891b2);animation-delay:.3s;width:min(250px,60vw)}
+.cake-layer:nth-child(6){background:linear-gradient(135deg,#8b5cf6,#7c3aed);animation-delay:.2s;width:min(275px,65vw)}
+.cake-layer:nth-child(7){background:linear-gradient(135deg,#f59e0b,#d97706);animation-delay:.1s;width:min(300px,70vw)}
 @keyframes cakeSlide{from{opacity:0;transform:translateY(15px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-height:800px){.cake-layer{padding:7px 14px;font-size:.78rem}.cake-diagram{gap:3px}}
 .splash-flags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:1rem 0;font-size:2rem}
@@ -244,13 +244,13 @@ h1,h2,h3{font-weight:700}
   </div>
   <div class="cake-wrap">
     <div class="cake-diagram">
-      <div class="cake-layer">Energy & Power Plants</div>
-      <div class="cake-layer">Chips & Compute</div>
-      <div class="cake-layer">Infrastructure & Data Centers</div>
-      <div class="cake-layer">Frontier Models</div>
-      <div class="cake-layer">Applications</div>
-      <div class="cake-layer">Government Regulation</div>
       <div class="cake-layer">Talent</div>
+      <div class="cake-layer">Government Regulation</div>
+      <div class="cake-layer">Applications</div>
+      <div class="cake-layer">Frontier Models</div>
+      <div class="cake-layer">Infrastructure & Data Centers</div>
+      <div class="cake-layer">Chips & Compute</div>
+      <div class="cake-layer">Energy & Power Plants</div>
     </div>
   </div>
   <p class="splash-info">Inspired by NVIDIA CEO Jensen Huang's "5-Layer AI Cake." Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first.</p>
