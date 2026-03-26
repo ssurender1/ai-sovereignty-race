@@ -740,7 +740,7 @@ function renderAP(){
 function getLeverBlock(lever,country,levers){
   const deps=LEVER_DEPS[lever]||{};
   for(const[req,min] of Object.entries(deps)){
-    if((levers[req]||0)<min)return`Needs ${LEVER_FULL[req]} ≥ ${min} (currently ${levers[req]||0})`;
+    if((levers[req]||0)<min)return`Boost ${LEVER_FULL[req]} to ${min} first (yours: ${levers[req]||0})`;
   }
   if(lever==="chips"){const cap=CHIPS_CAP[country]||100;if((levers.chips||0)>=cap)return`Chips capped at ${cap} for ${country} (export controls)`;}
   if(lever==="talent"){const cap=TALENT_CAP[country]||100;if((levers.talent||0)>=cap)return`Talent ceiling reached (${cap} for ${country})`;}
