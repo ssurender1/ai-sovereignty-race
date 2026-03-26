@@ -289,6 +289,10 @@ h1,h2,h3{font-weight:700}
         <h3>Rankings — % Growth from Baseline</h3>
         <div id="leaderboard"></div>
       </div>
+      <div class="panel" id="strategyPanel" style="border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.04)">
+        <h3 style="color:var(--gold)">🎯 Your Strategy</h3>
+        <div id="strategyCard" style="font-size:.82rem;color:var(--text);line-height:1.6"></div>
+      </div>
       <div class="panel" id="eventPanel">
         <h3>Global Event This Year</h3>
         <div id="eventCard"></div>
@@ -461,6 +465,29 @@ const LEVER_FULL={energy:"Energy & Power",chips:"Chips & Compute",infrastructure
 const LEVER_COLORS={energy:"#f59e0b",chips:"#8b5cf6",infrastructure:"#06b6d4",models:"#22c55e",applications:"#3b82f6",regulation:"#ef4444",talent:"#ec4899"};
 const LEVER_ICONS={energy:"⚡",chips:"🔬",infrastructure:"🏗️",models:"🧠",applications:"📱",regulation:"📜",talent:"🎓"};
 
+// ─── STRATEGIC CONSTRAINTS ───
+const LEVER_DEPS={
+  energy:{},
+  regulation:{},
+  talent:{},
+  infrastructure:{energy:40},
+  chips:{infrastructure:40},
+  models:{chips:45,talent:45},
+  applications:{models:35,talent:35},
+};
+const CHIPS_CAP={"United States":100,"Japan":100,"France":82,"China":68,"India":62,"Turkey":50,"Saudi Arabia":45,"South Africa":40};
+const TALENT_CAP={"India":95,"United States":88,"China":85,"France":82,"Turkey":78,"South Africa":72,"Japan":70,"Saudi Arabia":50};
+const COUNTRY_STRATEGY={
+  "United States":"Defend your models & apps lead. Chips ceiling is 100 — already near it. Gap is Regulation. Invest: Regulation → Models → Apps. Threat: talent competition and antitrust events.",
+  "China":"Chips are hard-capped at 68 by export controls — you cannot chip your way to victory. Path: Infra → Talent → Models → Apps. Regulation builds international trust.",
+  "India":"Talent ceiling is 95 — your superpower. But Energy and Infra must come first or nothing unlocks. Stack: Energy → Infra → Talent → Models → Apps.",
+  "Japan":"Chips are your edge — use them. Aging workforce caps Talent at 70. Path: Infra → Models → Apps. Regulation protects your lead once you have it.",
+  "Saudi Arabia":"Energy is unlimited. But Talent cap is 50 — you must buy access, not grow it. Path: Energy → Infra → Apps (via cloud). Chips ceiling: 45.",
+  "Turkey":"Balanced but middle-tier. Regulation is your hidden lever — unlocks soft power. Path: Energy → Infra → Apps. Chips cap is 50; skip chips via apps.",
+  "South Africa":"Lowest base = biggest % growth opportunity. Fix Energy first (nothing works without it). Talent can reach 72. You can win on % growth even with low absolute scores.",
+  "France":"Regulation is your card — EU AI Act makes you a governance leader. Talent is strong. Path: Talent → Models → Apps. Chips ceiling is 82 — solid but not a leader.",
+};
+
 const EVENTS=[
   {title:"Middle East Conflict Escalates",icon:"⚔️",desc:"Oil supply disruptions and shipping lane closures hit energy markets globally.",impact:{energy:-12},affected:["Saudi Arabia","Turkey"],bonus:{energy:8,targets:["Saudi Arabia"]}},
   {title:"US Antitrust Crackdown",icon:"⚖️",desc:"Tech giants face breakup proceedings. Model development and app ecosystems disrupted.",impact:{models:-10,applications:-6},affected:["United States"],bonus:{models:5,targets:["China","France"]}},
@@ -605,7 +632,8 @@ function aiMove(nation,nationName){
       target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
     }
     const boost=Math.round((Math.floor(Math.random()*7)+5)*catchupMult);
-    nation.levers[target]=clamp(nation.levers[target]+boost);
+    const capC=target==="chips"?(CHIPS_CAP[nationName]||100):(target==="talent"?(TALENT_CAP[nationName]||100):100);
+    nation.levers[target]=Math.min(capC,clamp(nation.levers[target]+boost));
     ap--;
   }
   nation.sovereignty=calcSovereignty(nation);
@@ -632,6 +660,7 @@ function renderGame(){
   renderEventCard();
   renderAP();
   renderLevers();
+  document.getElementById("strategyCard").textContent=COUNTRY_STRATEGY[gs.playerCountry]||"";
 }
 
 function renderLeaderboard(){
@@ -686,6 +715,16 @@ function renderAP(){
     <span style="font-size:.75rem;color:var(--muted);margin-left:auto">+10 per lever = 1 AP</span>`;
 }
 
+function getLeverBlock(lever,country,levers){
+  const deps=LEVER_DEPS[lever]||{};
+  for(const[req,min] of Object.entries(deps)){
+    if((levers[req]||0)<min)return`Needs ${LEVER_FULL[req]} ≥ ${min} (currently ${levers[req]||0})`;
+  }
+  if(lever==="chips"){const cap=CHIPS_CAP[country]||100;if((levers.chips||0)>=cap)return`Chips capped at ${cap} for ${country} (export controls)`;}
+  if(lever==="talent"){const cap=TALENT_CAP[country]||100;if((levers.talent||0)>=cap)return`Talent ceiling reached (${cap} for ${country})`;}
+  return null;
+}
+
 function renderLevers(){
   const panel=document.getElementById("leverPanel");
   const n=gameState.nations[gameState.playerCountry];
@@ -696,9 +735,12 @@ function renderLevers(){
     let deltaHtml="";
     if(diff>0)deltaHtml=`<span class="delta-badge up">+${diff}</span>`;
     else if(diff<0)deltaHtml=`<span class="delta-badge down">${diff}</span>`;
-    return `<div class="lever-row" id="lever-${l}">
+    const block=getLeverBlock(l,gameState.playerCountry,n.levers);
+    const isDisabled=gameState.ap<=0||v>=100||gameState.gameOver||!!block;
+    const capNote=block?`<span style="font-size:.7rem;color:var(--orange);display:block;margin-top:2px">🔒 ${block}</span>`:"";
+    return `<div class="lever-row" id="lever-${l}" style="${block?"opacity:.75":""}">
       <div class="lever-icon">${LEVER_ICONS[l]}</div>
-      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}</div>
+      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}${capNote}</div>
       <div class="lever-bar-wrap">
         <div class="lever-bar">
           <div class="lever-bar-fill" style="width:${v}%;background:linear-gradient(90deg,${LEVER_COLORS[l]}88,${LEVER_COLORS[l]})"></div>
@@ -706,7 +748,7 @@ function renderLevers(){
         </div>
       </div>
       <div class="lever-btns">
-        <button class="lever-btn" onclick="boostLever('${l}')" ${gameState.ap<=0||v>=100||gameState.gameOver?"disabled":""} title="+10 (1 AP)">+</button>
+        <button class="lever-btn" onclick="boostLever('${l}')" ${isDisabled?"disabled":""} title="${block||"+10 (1 AP)"}">+</button>
       </div>
     </div>`;
   }).join("");
@@ -716,6 +758,7 @@ function boostLever(lever){
   if(gameState.ap<=0||gameState.gameOver)return;
   const n=gameState.nations[gameState.playerCountry];
   if(n.levers[lever]>=100)return;
+  if(getLeverBlock(lever,gameState.playerCountry,n.levers))return;
   gameState.turnMoves.push({lever,prev:n.levers[lever]});
   n.levers[lever]=clamp(n.levers[lever]+10);
   n.sovereignty=calcSovereignty(n);
@@ -843,8 +886,10 @@ function startWatchMode(){
     year++;
     if(year>2036){
       clearInterval(watchInterval);
-      const winner=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty)[0];
-      popWatchEvent(`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins! ${winner[1].sovereignty} sovereignty</strong>`);
+      const winner=Object.entries(nations)
+        .map(([n,d])=>[n,d,Math.round((d.sovereignty-d.startSov)/Math.max(d.startSov,1)*100)])
+        .sort((a,b)=>b[2]-a[2])[0];
+      popWatchEvent(`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins! +${winner[2]}% growth</strong>`);
       for(let i=0;i<4;i++)setTimeout(()=>{const el=document.getElementById("watchEvent");const r=el.getBoundingClientRect();explodeAt(r.left+r.width/2,r.top+r.height/2);},i*300);
       return;
     }
