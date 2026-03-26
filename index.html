@@ -465,6 +465,27 @@ const LEVER_FULL={energy:"Energy & Power",chips:"Chips & Compute",infrastructure
 const LEVER_COLORS={energy:"#f59e0b",chips:"#8b5cf6",infrastructure:"#06b6d4",models:"#22c55e",applications:"#3b82f6",regulation:"#ef4444",talent:"#ec4899"};
 const LEVER_ICONS={energy:"⚡",chips:"🔬",infrastructure:"🏗️",models:"🧠",applications:"📱",regulation:"📜",talent:"🎓"};
 
+// ─── LEVER EFFICIENCY PER COUNTRY ───
+// How many points 1 AP buys on each lever — reflects real-world advantages/bottlenecks
+const LEVER_EFFICIENCY={
+  // US: near-maxed on everything except Regulation (62). Regulation is the entire game.
+  "United States":{energy:4,chips:4,infrastructure:5,models:8,applications:8,regulation:14,talent:6},
+  // China: Chips ALREADY above cap (starts at 72, cap=68) — locked. Infra+Apps+Talent is the path.
+  "China":{energy:7,chips:5,infrastructure:13,models:10,applications:13,regulation:9,talent:12},
+  // India: Talent is god-tier. Energy fixes the bottleneck. Stack talent→energy→infra→apps.
+  "India":{energy:13,chips:7,infrastructure:11,models:8,applications:11,regulation:8,talent:15},
+  // Japan: Chips are world-class (TSMC/fab advantage). Aging workforce caps Talent near start.
+  "Japan":{energy:10,chips:14,infrastructure:11,models:10,applications:10,regulation:12,talent:5},
+  // Saudi: Petrodollars build Infrastructure fast. Energy already at 92 — nearly wasted AP.
+  "Saudi Arabia":{energy:3,chips:6,infrastructure:16,models:7,applications:11,regulation:10,talent:6},
+  // Turkey: Regulation is soft power. Apps via cloud leapfrog (skip chips dependency in practice).
+  "Turkey":{energy:12,chips:7,infrastructure:12,models:8,applications:12,regulation:14,talent:10},
+  // South Africa: Lowest base = every point is high % gain. Energy crisis is the unlock key.
+  "South Africa":{energy:16,chips:6,infrastructure:12,models:7,applications:10,regulation:10,talent:14},
+  // France: Regulation leadership (EU AI Act). Talent and Models near breakthrough.
+  "France":{energy:8,chips:10,infrastructure:8,models:12,applications:10,regulation:14,talent:12},
+};
+
 // ─── STRATEGIC CONSTRAINTS ───
 const LEVER_DEPS={
   energy:{},
@@ -478,14 +499,14 @@ const LEVER_DEPS={
 const CHIPS_CAP={"United States":100,"Japan":100,"France":82,"China":68,"India":62,"Turkey":50,"Saudi Arabia":45,"South Africa":40};
 const TALENT_CAP={"India":95,"United States":88,"China":85,"France":82,"Turkey":78,"South Africa":72,"Japan":70,"Saudi Arabia":50};
 const COUNTRY_STRATEGY={
-  "United States":"Defend your models & apps lead. Chips ceiling is 100 — already near it. Gap is Regulation. Invest: Regulation → Models → Apps. Threat: talent competition and antitrust events.",
-  "China":"Chips are hard-capped at 68 by export controls — you cannot chip your way to victory. Path: Infra → Talent → Models → Apps. Regulation builds international trust.",
-  "India":"Talent ceiling is 95 — your superpower. But Energy and Infra must come first or nothing unlocks. Stack: Energy → Infra → Talent → Models → Apps.",
-  "Japan":"Chips are your edge — use them. Aging workforce caps Talent at 70. Path: Infra → Models → Apps. Regulation protects your lead once you have it.",
-  "Saudi Arabia":"Energy is unlimited. But Talent cap is 50 — you must buy access, not grow it. Path: Energy → Infra → Apps (via cloud). Chips ceiling: 45.",
-  "Turkey":"Balanced but middle-tier. Regulation is your hidden lever — unlocks soft power. Path: Energy → Infra → Apps. Chips cap is 50; skip chips via apps.",
-  "South Africa":"Lowest base = biggest % growth opportunity. Fix Energy first (nothing works without it). Talent can reach 72. You can win on % growth even with low absolute scores.",
-  "France":"Regulation is your card — EU AI Act makes you a governance leader. Talent is strong. Path: Talent → Models → Apps. Chips ceiling is 82 — solid but not a leader.",
+  "United States":"Your gap is Regulation (+14) — it's the only lever with room AND high efficiency. Chips & Infrastructure are near-maxed. Optimal path: Regulation → Models (+8) → Apps (+8). Win by closing your governance deficit while defending the models lead.",
+  "China":"Your Chips are ALREADY above the export control cap (72 > 68) — that lever is locked. Pivot to Infrastructure (+13) → Talent (+12) → Applications (+13). Models will follow. Avoid wasting AP on Energy (you're already strong there).",
+  "India":"Talent is your superpower (+15) — spend here first, no prerequisites. Then Energy (+13) to clear the Infrastructure bottleneck. Once Infra is up, stack: Infra (+11) → Models → Apps (+11). You can win on % growth from a low base.",
+  "Japan":"Chips are your edge (+14) — best efficiency in the game. Build: Chips → Infrastructure (+11) → Models (+10) → Apps (+10). Talent caps at 70 (aging workforce, only +5), so don't waste AP there. Regulation (+12) protects your lead.",
+  "Saudi Arabia":"Infrastructure (+16) is the highest single efficiency in the game — petrodollars build fast. DO NOT spend on Energy (already 92, only +3). Path: Infrastructure → Applications (+11) → Regulation (+10). Talent caps at 50; spend minimally.",
+  "Turkey":"Regulation (+14) is your surprise weapon — use it early for soft power gains. Then Energy (+12) → Infrastructure (+12) → Applications (+12). Chips cap is 50; don't over-invest. Talent (+10) gives a solid mid-game boost.",
+  "South Africa":"Energy (+16) is your unlock key — without it, Infrastructure stays locked. Start here. Then Talent (+14, no prerequisites). Path: Energy → Talent → Infrastructure (+12) → Apps (+10). Your low base means every gain is a big % win.",
+  "France":"Regulation (+14) is your identity — EU AI Act leadership. Stack: Regulation → Talent (+12) → Models (+12) → Apps (+10). Chips (+10) are solid (EU access). Your path to victory runs through governance, not hardware.",
 };
 
 const EVENTS=[
@@ -631,7 +652,8 @@ function aiMove(nation,nationName){
     }else{
       target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
     }
-    const boost=Math.round((Math.floor(Math.random()*7)+5)*catchupMult);
+    const effInc=(LEVER_EFFICIENCY[nationName]||{})[target]||10;
+    const boost=Math.round((effInc+Math.floor(Math.random()*4)-1)*catchupMult);
     const capC=target==="chips"?(CHIPS_CAP[nationName]||100):(target==="talent"?(TALENT_CAP[nationName]||100):100);
     nation.levers[target]=Math.min(capC,clamp(nation.levers[target]+boost));
     ap--;
@@ -737,10 +759,13 @@ function renderLevers(){
     else if(diff<0)deltaHtml=`<span class="delta-badge down">${diff}</span>`;
     const block=getLeverBlock(l,gameState.playerCountry,n.levers);
     const isDisabled=gameState.ap<=0||v>=100||gameState.gameOver||!!block;
+    const inc=(LEVER_EFFICIENCY[gameState.playerCountry]||{})[l]||10;
+    const effColor=inc>=13?"#4ade80":inc>=10?"#facc15":inc>=7?"#94a3b8":"#f87171";
+    const effLabel=`<span style="font-size:.68rem;font-weight:700;color:${effColor};margin-left:5px">+${inc}</span>`;
     const capNote=block?`<span style="font-size:.7rem;color:var(--orange);display:block;margin-top:2px">🔒 ${block}</span>`:"";
     return `<div class="lever-row" id="lever-${l}" style="${block?"opacity:.75":""}">
       <div class="lever-icon">${LEVER_ICONS[l]}</div>
-      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}${capNote}</div>
+      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}${effLabel}${capNote}</div>
       <div class="lever-bar-wrap">
         <div class="lever-bar">
           <div class="lever-bar-fill" style="width:${v}%;background:linear-gradient(90deg,${LEVER_COLORS[l]}88,${LEVER_COLORS[l]})"></div>
@@ -748,7 +773,7 @@ function renderLevers(){
         </div>
       </div>
       <div class="lever-btns">
-        <button class="lever-btn" onclick="boostLever('${l}')" ${isDisabled?"disabled":""} title="${block||"+10 (1 AP)"}">+</button>
+        <button class="lever-btn" onclick="boostLever('${l}')" ${isDisabled?"disabled":""} title="${block||`+${inc} per AP`}">+</button>
       </div>
     </div>`;
   }).join("");
@@ -759,8 +784,9 @@ function boostLever(lever){
   const n=gameState.nations[gameState.playerCountry];
   if(n.levers[lever]>=100)return;
   if(getLeverBlock(lever,gameState.playerCountry,n.levers))return;
+  const inc=(LEVER_EFFICIENCY[gameState.playerCountry]||{})[lever]||10;
   gameState.turnMoves.push({lever,prev:n.levers[lever]});
-  n.levers[lever]=clamp(n.levers[lever]+10);
+  n.levers[lever]=clamp(n.levers[lever]+inc);
   n.sovereignty=calcSovereignty(n);
   gameState.ap--;
   // Flash animation
