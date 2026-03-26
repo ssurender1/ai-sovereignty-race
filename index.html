@@ -73,6 +73,9 @@ h1,h2,h3{font-weight:700}
 .how-to-play{display:flex;flex-direction:column;gap:7px;margin:1rem 0;max-width:480px;width:100%}
 .htp-step{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 14px;font-size:.85rem;color:var(--text);text-align:left}
 .htp-icon{font-size:1.2rem;flex-shrink:0}
+.sov-btn{background:none;border:1px solid rgba(79,140,255,.5);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.sov-btn:hover{background:rgba(79,140,255,.1)}
+#sovModal.active{display:flex}
 .splash-credit{font-size:.72rem;color:var(--dim);margin-top:2rem;letter-spacing:.3px;padding-bottom:2rem}
 @media(max-height:800px){.splash-info{font-size:.82rem;margin:.5rem 0}.splash-btns{margin-top:.8rem}.splash-credit{margin-top:1rem;padding-bottom:3rem}}
 
@@ -241,7 +244,13 @@ h1,h2,h3{font-weight:700}
 <!-- SPLASH -->
 <div id="splash" class="screen">
   <h1>AI Nation</h1>
-  <p class="subtitle">Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first.</p>
+  <p class="subtitle">Race 8 nations over 10 years. Your strategic choices on 7 levers determine who achieves AI sovereignty first. <button class="sov-btn" onclick="document.getElementById('sovModal').classList.add('active')">What is AI Sovereignty? ↗</button></p>
+  <div class="how-to-play">
+    <div class="htp-step"><span class="htp-icon">🏳️</span><span>Pick a nation — each has unique strengths &amp; hard limits</span></div>
+    <div class="htp-step"><span class="htp-icon">⚡</span><span>Spend <strong>5 Action Points/year</strong> on 7 sovereignty levers</span></div>
+    <div class="htp-step"><span class="htp-icon">🌍</span><span>Survive random global events that shake every nation</span></div>
+    <div class="htp-step"><span class="htp-icon">🏆</span><span>Win by <strong>% improvement from start</strong> — so any nation can beat the US</span></div>
+  </div>
   <div class="splash-flags">
     <span>🇺🇸</span><span>🇨🇳</span><span>🇮🇳</span><span>🇯🇵</span><span>🇸🇦</span><span>🇹🇷</span><span>🇿🇦</span><span>🇫🇷</span>
   </div>
@@ -255,12 +264,6 @@ h1,h2,h3{font-weight:700}
       <div class="cake-layer">AI Chips</div>
       <div class="cake-layer">Energy & Power Plants</div>
     </div>
-  </div>
-  <div class="how-to-play">
-    <div class="htp-step"><span class="htp-icon">🏳️</span><span>Pick a nation — each has unique strengths &amp; hard limits</span></div>
-    <div class="htp-step"><span class="htp-icon">⚡</span><span>Spend <strong>5 Action Points/year</strong> on 7 sovereignty levers</span></div>
-    <div class="htp-step"><span class="htp-icon">🌍</span><span>Survive random global events that shake every nation</span></div>
-    <div class="htp-step"><span class="htp-icon">🏆</span><span>Win by <strong>% improvement</strong> — so any nation can beat the US</span></div>
   </div>
   <div class="splash-btns">
     <button class="btn btn-primary" onclick="showCountrySelect()">Play the Game</button>
@@ -352,6 +355,36 @@ h1,h2,h3{font-weight:700}
   <button class="btn btn-secondary watch-stop" onclick="stopWatch()">Stop Watching</button>
 </div>
 <canvas id="boom-canvas"></canvas>
+
+<!-- AI SOVEREIGNTY MODAL -->
+<div id="sovModal" style="display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;padding:2rem;background:rgba(0,0,0,.85);backdrop-filter:blur(5px)">
+  <div class="rules-box" style="max-width:580px">
+    <h2>🌐 What is AI Sovereignty?</h2>
+    <p style="color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:1rem">
+      <strong style="color:var(--text)">AI Sovereignty</strong> is a nation's ability to independently develop, deploy, and govern artificial intelligence — without depending on another country for critical parts of the stack.
+    </p>
+    <p style="color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:1rem">
+      Today, most nations are <em>not</em> AI sovereign. They rely on:
+      <br>🇺🇸 US chips (NVIDIA H100s) and cloud (AWS, Azure, Google)
+      <br>🇺🇸 US frontier models (GPT, Claude, Gemini)
+      <br>🇺🇸/🇳🇱 ASML lithography machines for chip production
+    </p>
+    <p style="color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:1rem">
+      A sovereign AI nation controls its own:
+      <br>⚡ <strong style="color:var(--text)">Energy</strong> — to power data centers
+      <br>🔬 <strong style="color:var(--text)">AI Chips</strong> — the NVIDIA H100s and equivalents
+      <br>🏗️ <strong style="color:var(--text)">Infrastructure</strong> — data centers, fiber, cloud
+      <br>🧠 <strong style="color:var(--text)">Frontier Models</strong> — GPT-class AI systems
+      <br>📱 <strong style="color:var(--text)">Applications</strong> — deployed AI in healthcare, defense, finance
+      <br>📜 <strong style="color:var(--text)">Regulation</strong> — governance frameworks and international trust
+      <br>🎓 <strong style="color:var(--text)">Talent</strong> — the engineers who build and run it all
+    </p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;font-style:italic">
+      Inspired by NVIDIA CEO Jensen Huang's "5-Layer AI Cake" framework.
+    </p>
+    <button class="btn btn-primary" style="margin-top:1.2rem;width:100%" onclick="document.getElementById('sovModal').classList.remove('active');document.getElementById('sovModal').style.display='none'">Got it!</button>
+  </div>
+</div>
 
 <!-- RULES MODAL -->
 <div id="rulesModal">
@@ -512,7 +545,7 @@ const COUNTRY_STRATEGY={
   "India":"Talent is your superpower (+15) — spend here first, no prerequisites. Then Energy (+13) to clear the Infrastructure bottleneck. Once Infra is up, stack: Infra (+11) → Models → Apps (+11). You can win on % growth from a low base.",
   "Japan":"Chips are your edge (+14) — best efficiency in the game. Build: Chips → Infrastructure (+11) → Models (+10) → Apps (+10). Talent caps at 70 (aging workforce, only +5), so don't waste AP there. Regulation (+12) protects your lead.",
   "Saudi Arabia":"Infrastructure (+16) is the highest single efficiency in the game — petrodollars build fast. DO NOT spend on Energy (already 92, only +3). Path: Infrastructure → Applications (+11) → Regulation (+10). Talent caps at 50; spend minimally.",
-  "Turkey":"Regulation (+14) is your surprise weapon — use it early for soft power gains. Then Energy (+12) → Infrastructure (+12) → Applications (+12). Chips cap is 50; don't over-invest. Talent (+10) gives a solid mid-game boost.",
+  "Turkey":"Step 1: Boost AI Chips to 45 (cap is 50, costs ~3 AP) — this unlocks Frontier Models. While doing that, stack Regulation (+14, no prerequisites). Step 2: Once Models unlock, push Applications (+12). Step 3: Energy (+12) → Infrastructure (+12) to strengthen the base. Talent (+10) grows to 78. Your path is Regulation + Apps, not chips.",
   "South Africa":"Energy (+16) is your unlock key — without it, Infrastructure stays locked. Start here. Then Talent (+14, no prerequisites). Path: Energy → Talent → Infrastructure (+12) → Apps (+10). Your low base means every gain is a big % win.",
   "France":"Regulation (+14) is your identity — EU AI Act leadership. Stack: Regulation → Talent (+12) → Models (+12) → Apps (+10). Chips (+10) are solid (EU access). Your path to victory runs through governance, not hardware.",
 };
