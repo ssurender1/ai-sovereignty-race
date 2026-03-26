@@ -843,10 +843,8 @@ function startWatchMode(){
     year++;
     if(year>2036){
       clearInterval(watchInterval);
-      const winner=Object.entries(nations)
-        .map(([n,d])=>[n,d,Math.round((d.sovereignty-d.startSov)/Math.max(d.startSov,1)*100)])
-        .sort((a,b)=>b[2]-a[2])[0];
-      popWatchEvent(`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins! +${winner[2]}% growth</strong>`);
+      const winner=Object.entries(nations).sort((a,b)=>b[1].sovereignty-a[1].sovereignty)[0];
+      popWatchEvent(`<strong>${NATIONS[winner[0]].flag} ${winner[0]} wins! ${winner[1].sovereignty} sovereignty</strong>`);
       for(let i=0;i<4;i++)setTimeout(()=>{const el=document.getElementById("watchEvent");const r=el.getBoundingClientRect();explodeAt(r.left+r.width/2,r.top+r.height/2);},i*300);
       return;
     }
@@ -861,21 +859,21 @@ function startWatchMode(){
       if(ev.bonus&&ev.bonus.targets&&ev.bonus.targets.includes(name)){
         LEVERS.forEach(l=>{if(ev.bonus[l]&&l!=="targets")n.levers[l]=clamp(n.levers[l]+ev.bonus[l])});
       }
-      // AI with catch-up mechanic
-      const catchM=n.sovereignty<40?1.8:n.sovereignty<55?1.4:n.sovereignty<70?1.15:1.0;
-      let ap=5;
+      // AI with mild catch-up and real randomness
+      const catchM=n.sovereignty<40?1.2:n.sovereignty<55?1.1:1.0;
+      let ap=3+Math.floor(Math.random()*5); // 3-7 APs per turn
       while(ap>0){
         let weakest=LEVERS[0],wVal=n.levers[LEVERS[0]];
         LEVERS.forEach(l=>{if(n.levers[l]<wVal){weakest=l;wVal=n.levers[l]}});
         const nd=NATIONS[name];
         const r=Math.random();
         let target;
-        if(r<0.5)target=weakest;
-        else if(r<0.75&&nd.aiStyle!=="balanced"){
+        if(r<0.4)target=weakest;
+        else if(r<0.65&&nd.aiStyle!=="balanced"){
           const sm={energy:"energy",chips:"chips",infrastructure:"infrastructure",talent:"talent",regulation:"regulation"};
           target=sm[nd.aiStyle]||LEVERS[Math.floor(Math.random()*LEVERS.length)];
         }else target=LEVERS[Math.floor(Math.random()*LEVERS.length)];
-        n.levers[target]=clamp(n.levers[target]+Math.round((Math.floor(Math.random()*7)+5)*catchM));
+        n.levers[target]=clamp(n.levers[target]+Math.round((Math.floor(Math.random()*8)+3)*catchM));
         ap--;
       }
       n.sovereignty=calcSovereignty(n);
