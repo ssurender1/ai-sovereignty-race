@@ -680,7 +680,8 @@ function startGame(){
 }
 
 function drawEvent(){
-  const ev={...EVENTS[Math.floor(Math.random()*EVENTS.length)]};
+  const pool=gameState.turn===0?EVENTS.filter(e=>e.title.startsWith("Middle East")):EVENTS;
+  const ev={...pool[Math.floor(Math.random()*pool.length)]};
   gameState.currentEvent=ev;
   Object.entries(gameState.nations).forEach(([name,n])=>{
     n.prevSov=n.sovereignty;
@@ -975,7 +976,8 @@ function startWatchMode(){
       for(let i=0;i<4;i++)setTimeout(()=>{const el=document.getElementById("watchEvent");const r=el.getBoundingClientRect();explodeAt(r.left+r.width/2,r.top+r.height/2);},i*300);
       return;
     }
-    const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+    const evPool=year===2027?EVENTS.filter(e=>e.title.startsWith("Middle East")):EVENTS;
+    const ev=evPool[Math.floor(Math.random()*evPool.length)];
     popWatchEvent(`${ev.icon||"🌍"} ${ev.title}`);
     (()=>{const el=document.getElementById("watchEvent");const r=el.getBoundingClientRect();explodeAt(r.left+r.width/2,r.top+r.height/2);})();
     Object.entries(nations).forEach(([name,n])=>{
