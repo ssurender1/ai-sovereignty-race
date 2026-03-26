@@ -892,7 +892,7 @@ function renderWatchBars(nations,year){
   document.getElementById("watchBars").innerHTML=sorted.map(([name,n,imp],i)=>{
     const isFirst=i===0;
     // Bar width = absolute sovereignty; label = % improvement
-    const impLabel=imp>0?`+${imp}%`:imp<0?`${imp}%`:"0%`;
+    const impLabel=imp>0?`+${imp}%`:imp<0?`${imp}%`:"0%";
     return `<div class="watch-row">
       <div class="wflag">${NATIONS[name].flag}</div>
       <div class="wname" style="${isFirst?"color:var(--gold);font-weight:800":""}">${name}</div>
