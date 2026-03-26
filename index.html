@@ -761,11 +761,10 @@ function renderLevers(){
     const isDisabled=gameState.ap<=0||v>=100||gameState.gameOver||!!block;
     const inc=(LEVER_EFFICIENCY[gameState.playerCountry]||{})[l]||10;
     const effColor=inc>=13?"#4ade80":inc>=10?"#facc15":inc>=7?"#94a3b8":"#f87171";
-    const effLabel=`<span style="font-size:.68rem;font-weight:700;color:${effColor};margin-left:5px">+${inc}</span>`;
-    const capNote=block?`<span style="font-size:.7rem;color:var(--orange);display:block;margin-top:2px">🔒 ${block}</span>`:"";
+    const capNote=block?`<div style="font-size:.68rem;color:var(--orange);margin-top:2px">🔒 ${block}</div>`:"";
     return `<div class="lever-row" id="lever-${l}" style="${block?"opacity:.75":""}">
       <div class="lever-icon">${LEVER_ICONS[l]}</div>
-      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}${effLabel}${capNote}</div>
+      <div class="lever-name" style="color:${LEVER_COLORS[l]}">${LEVER_FULL[l]}${capNote}</div>
       <div class="lever-bar-wrap">
         <div class="lever-bar">
           <div class="lever-bar-fill" style="width:${v}%;background:linear-gradient(90deg,${LEVER_COLORS[l]}88,${LEVER_COLORS[l]})"></div>
@@ -773,7 +772,7 @@ function renderLevers(){
         </div>
       </div>
       <div class="lever-btns">
-        <button class="lever-btn" onclick="boostLever('${l}')" ${isDisabled?"disabled":""} title="${block||`+${inc} per AP`}">+</button>
+        <button class="lever-btn" onclick="boostLever('${l}')" ${isDisabled?"disabled":""} title="${block||`+${inc} per AP`}" style="color:${effColor};min-width:42px;font-size:.8rem">+${inc}</button>
       </div>
     </div>`;
   }).join("");
